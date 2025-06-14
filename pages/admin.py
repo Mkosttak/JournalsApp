@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Contact
+from .models import Contact, Subscriber
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
@@ -12,3 +12,10 @@ class ContactAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         # Admin panelinden yeni mesaj eklenmesini engelle
         return False
+
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'subscribed_at')
+    search_fields = ('email',)
+    list_filter = ('subscribed_at',)
+
+admin.site.register(Subscriber, SubscriberAdmin)

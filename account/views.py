@@ -21,13 +21,11 @@ def user_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.add_message(request, messages.SUCCESS, 'Başarılı bir şekilde giriş yaptınız!')
                 nextUrl = request.GET.get('next', None)
                 return redirect(nextUrl if nextUrl else 'pages:index')
             else:
                 return render(request, 'account/login.html', {"form": form})
         else:
-            messages.add_message(request, messages.ERROR, 'Username ya da password hatalı!')
             return render(request, 'account/login.html', {"form": form})
     else:
         form = LoginUserForm()

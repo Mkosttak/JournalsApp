@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.conf import settings
-from .forms import ContactForm
+from .forms import ContactForm, SubscriberForm
 from .models import Contact
 
 
@@ -23,6 +23,8 @@ def contact(request):
             form.save()
             messages.success(request, 'Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.')
             return redirect('pages:contact')
+        else:
+            messages.error(request, 'Lütfen tüm alanları doğru doldurduğunuzdan emin olun.')
     else:
         form = ContactForm()
 
@@ -131,3 +133,14 @@ def toggle_message_status(request, message_id):
         'success': False,
         'error': 'Geçersiz istek metodu'
     }, status=400)
+
+def subscribe_view(request):
+    if request.method == 'POST':
+        form = SubscriberForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Aboneliğiniz başarıyla oluşturuldu. Teşekkür ederiz!')
+        else:
+            messages.error(request, 'Bu e-posta adresi zaten kayıtlı veya geçersiz.')
+    # Kullanıcıyı geldiği sayfaya geri yönlendir
+    return redirect(request.META.get('HTTP_REFERER', '/'))

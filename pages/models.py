@@ -15,3 +15,14 @@ class Contact(models.Model):
         verbose_name = "İletişim Mesajı"
         verbose_name_plural = "İletişim Mesajları"
         ordering = ['-created_at']
+
+class Subscriber(models.Model):
+    email = models.EmailField(unique=True, max_length=254)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        verbose_name = "Abone"
+        verbose_name_plural = "Aboneler"
