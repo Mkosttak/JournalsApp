@@ -55,6 +55,7 @@ class UserPasswordChangeForm(PasswordChangeForm):
 
 class AuthorProfileForm(ModelForm):
     clear_resume = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput())
+    clear_profile_image = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput())
 
     class Meta:
         model = Author

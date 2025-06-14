@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 
 
@@ -29,3 +29,33 @@ class Author(models.Model):
 def delete_user_with_author(sender, instance, **kwargs):
     if instance.user:
         instance.user.delete()
+
+@receiver(pre_save, sender=Author)
+def auto_delete_old_files_on_update(sender, instance, **kwargs):
+    if not instance.pk:
+        return False
+
+    try:
+        old_instance = Author.objects.get(pk=instance.pk)
+        old_profile_image = old_instance.profile_image
+        old_resume = old_instance.resume
+    except Author.DoesNotExist:
+        return False
+
+    new_profile_image = instance.profile_image
+    new_resume = instance.resume
+
+    # Delete old profile image if it's changed and not the default image
+    if old_profile_image and old_profile_image != new_profile_image and 'default.png' not in old_profile_image.name:
+        old_profile_image.delete(save=False)
+
+    # Delete old resume if it's changed
+    if old_resume and old_resume != new_resume:
+        old_resume.delete(save=False)
+
+@receiver(post_delete, sender=Author)
+def auto_delete_files_on_delete(sender, instance, **kwargs):
+    if instance.profile_image and 'default.png' not in instance.profile_image.name:
+        instance.profile_image.delete(save=False)
+    if instance.resume:
+        instance.resume.delete(save=False)

@@ -183,8 +183,8 @@ def article_delete(request, id):
     except ValueError:
         article = get_object_or_404(Article, slug=id)
 
-    # Sadece superuser silebilir
-    if not request.user.is_superuser:
+    # Sadece superuser veya makalenin yazarı silebilir
+    if not (request.user.is_superuser or request.user == article.author):
         raise PermissionDenied("Bu makaleyi silme yetkiniz bulunmamaktadır.")
 
     if request.method == "POST":

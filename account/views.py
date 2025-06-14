@@ -98,12 +98,29 @@ def profile_edit(request):
         author_form = AuthorProfileForm(request.POST, request.FILES, instance=author, user=request.user)
         if user_form.is_valid() and author_form.is_valid():
             user_form.save()
-            # Handle resume clearing separately before saving the author form
+
+            # Handle resume clearing
             if author_form.cleaned_data.get('clear_resume'):
                 author.resume = None
-                author.save(update_fields=['resume'])
-            else:
-                author_form.save()
+
+            # Handle profile image clearing
+            if author_form.cleaned_data.get('clear_profile_image'):
+                author.profile_image = None
+
+            # Save the author instance, which will save new files or set fields to None as appropriate
+            author.save()
+            # The author_form.save() call is no longer needed here for file fields,
+            # as we explicitly handle resume and profile_image. 
+            # If there were other fields in AuthorProfileForm not directly handled,
+            # author_form.save() would be appropriate, but with this structure,
+            # direct saving of `author` instance is cleaner after modifying fields directly.
+            # If `author_form.save()` is called after setting `author.resume = None`
+            # and `author.profile_image = None`, it might try to re-save previous values
+            # if the form still holds them from `instance=author`.
+            # Given `AuthorProfileForm` only has `profile_image`, `bio`, `resume`, `is_approved`
+            # and we handle `profile_image` and `resume` explicitly here, 
+            # `author.save()` should be sufficient to persist the changes to these fields.
+
             messages.success(request, 'Profiliniz başarıyla güncellendi.')
             return redirect('account:profile')
         else:
