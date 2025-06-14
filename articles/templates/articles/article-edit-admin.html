@@ -1,0 +1,174 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+    <link rel="stylesheet" href="{% static 'articles/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}
+    Makale Düzenle ADMİN
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9 col-12">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Makale Düzenle</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <style>
+                        .form-clear { display: none !important; }
+                        </style>
+                        {% include 'partials/_form.html' %}
+
+                        <div class="d-flex gap-2 mt-4 justify-content-end">
+                            <button class="btn btn-primary px-4 py-2 rounded-pill shadow-sm" type="submit">
+                                <i class="bi bi-save me-1"></i> Kaydet
+                            </button>
+                            <a href="{% url 'articles:article_list' %}" class="btn btn-light px-4 py-2 rounded-pill">
+                                <i class="bi bi-x-lg me-1"></i> Vazgeç
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yeni Kategori Ekleme Modalı -->
+{% if user.is_superuser %}
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Yeni Kategori Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div id="categoryErrorMessages" class="alert alert-danger alert-dismissible fade show rounded-3 border-0 shadow-sm mb-3 d-none" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                        <div id="categoryErrorMessageText"></div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="mb-3">
+                    <label for="newCategoryName" class="form-label">Kategori Adı</label>
+                    <input type="text" class="form-control" id="newCategoryName">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary" id="saveNewCategoryBtn">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.card-header {
+    background: linear-gradient(45deg, #0d6efd, #0a58ca);
+}
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.2rem !important;
+    }
+    .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block js_files %}
+<script src="{% static 'articles/js/script.js' %}"></script>
+{% if user.is_superuser %}
+<script>
+    // Ensure the modal instance is created only once when the page loads
+    const addCategoryModalElement = document.getElementById('addCategoryModal');
+    const addCategoryModalInstance = new bootstrap.Modal(addCategoryModalElement);
+
+    function showCategoryError(message) {
+        document.getElementById('categoryErrorMessageText').innerText = message;
+        document.getElementById('categoryErrorMessages').classList.remove('d-none');
+    }
+
+    function clearCategoryError() {
+        document.getElementById('categoryErrorMessageText').innerText = '';
+        document.getElementById('categoryErrorMessages').classList.add('d-none');
+    }
+
+    document.getElementById('showAddCategoryModalBtn').addEventListener('click', function(event) {
+        console.log('showAddCategoryModalBtn tıklandı.');
+        event.preventDefault();
+        event.stopPropagation();
+        clearCategoryError(); // Clear errors when opening the modal
+        document.getElementById('newCategoryName').value = ''; // Clear input field
+        addCategoryModalInstance.show(); // Directly show the modal
+    });
+
+    document.getElementById('saveNewCategoryBtn').addEventListener('click', function(event) {
+        console.log('saveNewCategoryBtn tıklandı.');
+        event.preventDefault();
+        event.stopPropagation();
+        clearCategoryError(); // Clear previous errors on new attempt
+        var newCategoryName = document.getElementById('newCategoryName').value.trim();
+        if (newCategoryName === '') {
+            showCategoryError('Kategori adı boş olamaz.');
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "articles:create_category_ajax" %}', true);
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.id && response.name) {
+                        var select = document.getElementById('id_categories');
+                        var option = new Option(response.name, response.id, true, true);
+                        select.add(option);
+
+                        var changeEvent = new Event('change');
+                        select.dispatchEvent(changeEvent);
+
+                        console.log('Kategori başarıyla eklendi: ' + response.name);
+                        document.getElementById('newCategoryName').value = '';
+                        
+                        console.log('Modal gizleniyor...');
+                        addCategoryModalInstance.hide(); 
+
+                    } else {
+                        // This case should ideally be handled by the server returning a 400 status
+                        showCategoryError('Kategori eklenirken bir hata oluştu.');
+                    }
+                } catch (e) {
+                    showCategoryError('Sunucudan geçersiz yanıt: ' + e.message);
+                }
+            } else {
+                try {
+                    var errorResponse = JSON.parse(xhr.responseText);
+                    showCategoryError(errorResponse.error || 'Bilinmeyen bir hata oluştu.');
+                } catch (e) {
+                    showCategoryError('Sunucudan hata yanıtı ayrıştırılırken hata oluştu.');
+                }
+            }
+        };
+        xhr.onerror = function() {
+            showCategoryError('İstek gönderilirken bir ağ hatası oluştu.');
+        };
+
+        xhr.send('name=' + encodeURIComponent(newCategoryName));
+    });
+</script>
+{% endif %}
+{% endblock %}

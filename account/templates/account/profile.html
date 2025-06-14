@@ -1,0 +1,157 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}Profilim{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <!-- Sol Sidebar: Profil Bilgileri -->
+        <div class="col-lg-4 mb-4 mb-lg-0">
+            <div class="card modern-card shadow-sm slide-up sticky-lg-top" style="top: 2rem;">
+                <div class="card-body text-center p-4">
+                    {% if author.profile_image %}
+                        <img src="{{ author.profile_image.url }}" alt="{{ user.username }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                        <div class="profile-image-placeholder rounded-circle mb-3 d-inline-flex align-items-center justify-content-center bg-secondary text-white mx-auto" style="width: 120px; height: 120px;">
+                            <i class="bi bi-person-fill" style="font-size: 4rem;"></i>
+                        </div>
+                    {% endif %}
+                    <h4 class="mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                    
+                    <!-- Kullanıcı Bilgileri -->
+                    <div class="user-info mt-3">
+                        {% if user.email %}
+                        <div class="mb-2">
+                            <i class="bi bi-envelope-fill text-primary me-2"></i>
+                            <span class="text-muted">{{ user.email }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {% if author.resume %}
+                        <a href="{{ author.resume.url }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                            <i class="bi bi-file-earmark-text-fill me-1"></i> Özgeçmişimi Görüntüle
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'account:profile_edit' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-pencil-square me-1"></i> Profili Düzenle
+                        </a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ İçerik: Makaleler ve İstatistikler -->
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">Makalelerim</h3>
+                <a href="{% url 'articles:article_create' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Yeni Makale
+                </a>
+            </div>
+
+            <!-- İstatistik Kartları -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="stat-card bg-primary text-white rounded-4 p-3 slide-up">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon me-3">
+                                <i class="bi bi-file-text fs-1"></i>
+                            </div>
+                            <div>
+                                <h3 class="stat-number mb-0">{{ total_articles }}</h3>
+                                <p class="stat-label mb-0">Toplam Makale</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="stat-card bg-success text-white rounded-4 p-3 slide-up">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon me-3">
+                                <i class="bi bi-check-circle fs-1"></i>
+                            </div>
+                            <div>
+                                <h3 class="stat-number mb-0">{{ published_articles }}</h3>
+                                <p class="stat-label mb-0">Yayınlanmış</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card bg-warning text-white rounded-4 p-3 slide-up">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon me-3">
+                                <i class="bi bi-clock fs-1"></i>
+                            </div>
+                            <div>
+                                <h3 class="stat-number mb-0">{{ pending_articles }}</h3>
+                                <p class="stat-label mb-0">Onay Bekleyen</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Son Makaleler -->
+            <div class="card modern-card shadow-sm slide-up mb-4">
+                <div class="card-header modern-card-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0">Son Makalelerim</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% if recent_articles %}
+                            {% for article in recent_articles %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'articles:article_details' article.slug %}" class="text-decoration-none text-dark me-2">{{ article.title }}</a>
+                                    <span class="badge {% if article.isHome %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
+                                        {% if article.isHome %}Ana Sayfada{% else %}İncelemede{% endif %}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item text-center text-muted">Henüz makale yok.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% if recent_articles %}
+                <div class="card-footer text-center bg-light rounded-bottom-4">
+                    <a href="{% url 'account:my_articles' %}" class="btn btn-primary btn-sm text-decoration-none">Tüm Makalelerimi Gör <i class="bi bi-arrow-right"></i></a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Diğer Profil Bilgileri (İsteğe Bağlı) -->
+            {# Buraya yazarın diğer bilgileri veya istatistikler eklenebilir #}
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js_files %}
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}
+
+<style>
+.card {
+    border-radius: 1rem;
+}
+
+.list-group-item {
+    padding: 1rem 0;
+}
+
+.list-group-item:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
+.list-group-item:hover {
+    background-color: rgba(13, 110, 253, 0.03);
+}
+</style>

@@ -1,0 +1,209 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'articles/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}
+Admin Kategoriler
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'pages:index' %}" class="text-decoration-none">Ana Sayfa</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Admin Kategoriler</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4 d-flex justify-content-between align-items-center py-3">
+                    <h4 class="mb-0"><i class="bi bi-tags-fill me-2"></i>Admin Kategoriler</h4>
+                    <button type="button" class="btn btn-light btn-sm rounded-pill px-3 shadow-sm" id="showAddCategoryModalBtn">
+                        <i class="bi bi-plus-circle me-1"></i>Yeni Kategori Ekle
+                    </button>
+                </div>
+                <div class="card-body p-4">
+                    {% if categories %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sıra</th>
+                                    <th scope="col">Kategori Adı</th>
+                                    <th scope="col" class="text-center">Makale Sayısı</th>
+                                    <th scope="col" class="text-center">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoriesTableBody">
+                                {% for category in categories %}
+                                <tr data-category-id="{{ category.id }}">
+                                    <td>{{ category.order }}</td>
+                                    <td>{{ category.name }}</td>
+                                    <td class="text-center">{{ category.article_count }}</td>
+                                    <td class="text-center">
+                                        <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Sil" onclick="confirmDelete('{{ category.id }}', '{{ category.name }}')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning text-center rounded-3 shadow-sm border-0" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Henüz hiç kategori bulunmamaktadır.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yeni Kategori Ekleme Modalı -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Yeni Kategori Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div id="categoryErrorMessages" class="alert alert-danger alert-dismissible fade show rounded-3 border-0 shadow-sm mb-3 d-none" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                        <div id="categoryErrorMessageText"></div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="mb-3">
+                    <label for="newCategoryName" class="form-label">Kategori Adı</label>
+                    <input type="text" class="form-control" id="newCategoryName">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary" id="saveNewCategoryBtn">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kategori Silme Onay Modalı -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Silme Onayı</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>"<strong id="itemNameToDelete"></strong>" kategorisini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form action="{% url 'articles:category_delete' 0 %}" method="POST" id="deleteItemForm" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js_files %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+<script src="{% static 'articles/js/script.js' %}"></script>
+<script>
+    // Yeni Kategori Ekleme Modalı için JavaScript
+    const addCategoryModalElement = document.getElementById('addCategoryModal');
+    const addCategoryModalInstance = new bootstrap.Modal(addCategoryModalElement);
+
+    function showCategoryError(message) {
+        document.getElementById('categoryErrorMessageText').innerText = message;
+        document.getElementById('categoryErrorMessages').classList.remove('d-none');
+    }
+
+    function clearCategoryError() {
+        document.getElementById('categoryErrorMessageText').innerText = '';
+        document.getElementById('categoryErrorMessages').classList.add('d-none');
+    }
+
+    document.getElementById('showAddCategoryModalBtn').addEventListener('click', function(event) {
+        console.log('showAddCategoryModalBtn tıklandı.');
+        event.preventDefault();
+        event.stopPropagation();
+        clearCategoryError(); // Clear errors when opening the modal
+        document.getElementById('newCategoryName').value = ''; // Clear input field
+        addCategoryModalInstance.show(); // Directly show the modal
+    });
+
+    document.getElementById('saveNewCategoryBtn').addEventListener('click', function(event) {
+        console.log('saveNewCategoryBtn tıklandı.');
+        event.preventDefault();
+        event.stopPropagation();
+        clearCategoryError(); // Clear previous errors on new attempt
+        var newCategoryName = document.getElementById('newCategoryName').value.trim();
+        if (newCategoryName === '') {
+            showCategoryError('Kategori adı boş olamaz.');
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{% url "articles:create_category_ajax" %}', true);
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.id && response.name) {
+                        console.log('Kategori başarıyla eklendi: ' + response.name);
+                        document.getElementById('newCategoryName').value = '';
+                        
+                        addCategoryModalInstance.hide(); 
+                        location.reload();
+
+                    } else {
+                        showCategoryError('Kategori eklenirken bir hata oluştu.');
+                    }
+                } catch (e) {
+                    showCategoryError('Sunucudan geçersiz yanıt: ' + e.message);
+                }
+            } else {
+                try {
+                    var errorResponse = JSON.parse(xhr.responseText);
+                    showCategoryError(errorResponse.error || 'Bilinmeyen bir hata oluştu.');
+                } catch (e) {
+                    showCategoryError('Sunucudan hata yanıtı ayrıştırılırken hata oluştu.');
+                }
+            }
+        };
+        xhr.onerror = function() {
+            showCategoryError('İstek gönderilirken bir ağ hatası oluştu.');
+        };
+
+        xhr.send('name=' + encodeURIComponent(newCategoryName));
+    });
+
+    // Kategori Silme Modalı için JavaScript
+    const confirmDeleteModalElement = document.getElementById('confirmDeleteModal');
+    const confirmDeleteModalInstance = new bootstrap.Modal(confirmDeleteModalElement);
+
+    function confirmDelete(itemId, itemName) {
+        document.getElementById('itemNameToDelete').innerText = itemName;
+        const deleteForm = document.getElementById('deleteItemForm');
+        deleteForm.action = deleteForm.action.replace('/0/', '/' + itemId + '/');
+        confirmDeleteModalInstance.show();
+    }
+</script>
+{% endblock %} 

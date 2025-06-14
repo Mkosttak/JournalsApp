@@ -1,0 +1,166 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}Makalelerim{% endblock %}
+
+{% block content %}
+<div class="container py-4 animate__animated animate__fadeIn">
+    <!-- İstatistik Kartları -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card bg-primary text-white rounded-4 p-3 slide-up">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="bi bi-file-text fs-1"></i>
+                    </div>
+                    <div>
+                        <h3 class="stat-number mb-0">{{ total_articles }}</h3>
+                        <p class="stat-label mb-0">Toplam Makale</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-success text-white rounded-4 p-3 slide-up">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="bi bi-check-circle fs-1"></i>
+                    </div>
+                    <div>
+                        <h3 class="stat-number mb-0">{{ approved_articles }}</h3>
+                        <p class="stat-label mb-0">Onaylı Makale</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-warning text-white rounded-4 p-3 slide-up">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="bi bi-clock fs-1"></i>
+                    </div>
+                    <div>
+                        <h3 class="stat-number mb-0">{{ pending_articles }}</h3>
+                        <p class="stat-label mb-0">Onay Bekleyen</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Makale Ekleme Butonu -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'articles:article_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Yeni Makale
+        </a>
+        <!-- Arama Kutusu -->
+        <div class="col-md-4 col-lg-3">
+            <form method="GET" class="mb-0">
+                <div class="input-group input-group-sm rounded-pill border">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Makalelerimde ara..." value="{{ request.GET.q }}">
+                    <button class="btn btn-outline-primary btn-sm rounded-pill ms-2" type="submit">Ara</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Makaleler Listesi -->
+    <div class="row">
+        {% if articles %}
+            {% for article in articles %}
+            <div class="col-12 mb-4">
+                <div class="card modern-card hover-shadow slide-up">
+                    <div class="card-body p-4 pb-6 d-flex flex-column flex-md-row align-items-md-start position-relative">
+                        <div class="position-absolute top-0 end-0 mt-3 me-3 d-flex flex-column align-items-end">
+                            {% if article.isHome %}
+                                <span class="badge bg-success-subtle text-success-emphasis px-2 py-1 rounded-pill mb-2 status-badge">
+                                    <i class="bi bi-check-circle me-1"></i>Yayınlandı
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis px-2 py-1 rounded-pill mb-2 status-badge">
+                                    <i class="bi bi-clock me-1"></i>İncelemede
+                                </span>
+                            {% endif %}
+                            <div class="d-flex flex-row flex-md-column gap-2 mt-2">
+                                <a href="{% url 'articles:article_edit' article.slug %}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
+                                    <i class="bi bi-pencil text-primary"></i>
+                                </a>
+                                <a href="{% url 'articles:article_delete' article.slug %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Sil" onclick="return confirm('Bu makaleyi silmek istediğinize emin misiniz?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <a href="{% url 'articles:article_details' article.slug %}" class="text-decoration-none text-dark mb-3 mb-md-0 article-content-link">
+                            <h5 class="card-title mb-1 d-flex align-items-center">
+                                <span class="text-truncate">{{ article.title }}</span>
+                                {% comment %}
+                                {% if article.admin_note %}
+                                    <span class="badge bg-info-subtle text-info-emphasis px-2 py-1 rounded-pill ms-auto flex-shrink-0 mb-1">
+                                        <i class="bi bi-chat-dots me-1"></i>Mesajınız var
+                                    </span>
+                                {% endif %}
+                                {% endcomment %}
+                            </h5>
+                            <small class="text-muted d-flex align-items-center mb-2">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ article.created_at|date:"d M Y" }}
+                            </small>
+                            <p class="card-text text-muted small mb-2">{{ article.description|truncatechars:250 }}</p>
+                            
+                            {% comment %}
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                {% if article.categories.all %}
+                                {% for category in article.categories.all %}
+                                <span class="badge bg-primary rounded-pill d-flex align-items-center">
+                                    <i class="bi bi-tag-fill me-1"></i>
+                                    {{ category.name }}
+                                </span>
+                                {% endfor %}
+                                {% endif %}
+                                {% if article.keywords %}
+                                {% for keyword in article.keyword_list %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill me-1">
+                                        {{ keyword }}
+                                    </span>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                            {% endcomment %}
+                            
+                            {% if article.admin_note %}
+                            <div class="d-flex align-items-center bg-info-subtle text-info-emphasis rounded-3 p-3 mt-2 mb-2 small border-start border-info border-4">
+                                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                                <strong>Yönetici Notu:</strong> {{ article.admin_note }}
+                            </div>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="bi bi-journal-x display-1 text-muted mb-3"></i>
+                    <h3 class="h4 text-muted">Henüz bir makale yayınlamamışsınız</h3>
+                    <p class="text-muted mb-4">İlk makalenizi oluşturmak için aşağıdaki butona tıklayın</p>
+                    <a href="{% url 'articles:article_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>İlk Makalenizi Oluşturun
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block js_files %}
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

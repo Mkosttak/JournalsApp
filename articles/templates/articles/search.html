@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+
+{% block css_file %}
+    <link rel="stylesheet" href="{% static 'articles/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}
+    Makaleler
+{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-3">
+                <!--menu -->
+                {% include 'articles/partials/_categories.html' %}
+
+
+
+            </div>
+            <div class="col-9">
+                <!-- Content -->
+                {% if articles|length == 0 %}
+                	<div class="alert alert-warning">Kurs Bulunumadı.</div>
+                {% endif %}
+                {% for article in articles %}
+                    	{% include 'articles/partials/_article.html' %}
+                {% endfor %}
+            
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js_files %}
+	<spript src="{% static 'articles/js/script.js' %}"></spript>
+{% endblock %}

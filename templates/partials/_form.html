@@ -1,0 +1,16 @@
+{% load widget_tweaks %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0 mb-4" role="alert">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+        <div>{{ error }}</div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+
+{% for field in form %}
+    {% if field.name != 'profile_image' and field.name != 'resume' and field.name != 'is_approved' and field.name != 'bio' %}
+        {% include 'partials/_form_field.html' with form_field=field %}
+    {% endif %}
+{% endfor %}

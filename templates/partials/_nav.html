@@ -1,0 +1,184 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <i class="bi bi-journal-text fs-4 me-2 text-primary"></i>
+      <span>Makaleler</span>
+    </a>
+
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav" aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a href="/" class="nav-link {% if request.resolver_match.url_name == 'index' and request.resolver_match.app_name == '' %}active fw-bold{% endif %}">
+            <i class="bi bi-house-door me-1"></i>Ana Sayfa
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/makale/" class="nav-link {% if request.resolver_match.app_name == 'articles' and request.resolver_match.url_name == 'index' %}active fw-bold{% endif %}">
+            <i class="bi bi-newspaper me-1"></i>Makaleler
+          </a>
+        </li>
+
+        {% if user.is_authenticated and not user.is_superuser %}
+        <li class="nav-item">
+          <a href="{% url 'articles:article_create' %}" class="nav-link {% if request.resolver_match.url_name == 'article_create' %}active fw-bold{% endif %}">
+            <i class="bi bi-plus-circle me-1"></i>Makale Ekle
+          </a>
+        </li>
+        {% endif %}
+
+        <li class="nav-item">
+          <a href="{% url 'account:authors_list' %}" class="nav-link {% if request.resolver_match.url_name == 'authors_list' %}active fw-bold{% endif %}">
+            <i class="bi bi-people me-1"></i>Editörler
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/about/" class="nav-link {% if request.resolver_match.url_name == 'about' %}active fw-bold{% endif %}">
+            <i class="bi bi-info-circle me-1"></i>Hakkımızda
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/contact/" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active fw-bold{% endif %}">
+            <i class="bi bi-envelope me-1"></i>İletişim
+          </a>
+        </li>
+
+        {% if user.is_authenticated %}
+            {% if user.author.editor_article %}
+                <li class="nav-item">
+                    <a href="{% url 'account:editor_articles' %}" class="nav-link nav-link-red {% if request.resolver_match.url_name == 'editor_articles' %}active fw-bold{% endif %}">
+                        <i class="bi bi-pencil-square me-1"></i>Editör Makaleleri
+                    </a>
+                </li>
+            {% endif %}
+
+            {% if user.is_superuser %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle nav-link-red active" href="#" id="adminDropdown"
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-gear"></i>Admin İşlemleri<i class="bi bi-caret-down-fill ms-1"></i>
+                    </a>
+                    <ul class="dropdown-menu shadow-sm" aria-labelledby="adminDropdown">
+                        <li><a href="{% url 'articles:article_list' %}" class="dropdown-item">
+                            <i class="bi bi-list-ul me-2"></i>Admin Makaleler
+                        </a></li>
+                        <li><a href="{% url 'account:admin_authors' %}" class="dropdown-item">
+                            <i class="bi bi-person-gear me-2"></i>Admin Editörler
+                        </a></li>
+                        <li><a href="{% url 'articles:admin_categories' %}" class="dropdown-item">
+                            <i class="bi bi-tags-fill me-2"></i>Admin Kategoriler
+                        </a></li>
+                        <li><a href="{% url 'pages:admin_contact' %}" class="dropdown-item">
+                            <i class="bi bi-envelope-fill me-2"></i>Admin İletişim
+                        </a></li>
+                    </ul>
+                </li>
+            {% endif %}
+        {% endif %}
+      </ul>
+
+      <ul class="navbar-nav">
+        {% if user.is_authenticated %}
+            {% if user.is_superuser %}
+                {% if unread_messages_count > 0 %}
+                <li class="nav-item me-2">
+                    <a href="{% url 'pages:admin_contact' %}" class="nav-link position-relative">
+                        <i class="bi bi-envelope-exclamation-fill fs-5 text-danger"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="z-index: 1; font-size: 0.75em; padding: .3em .6em; min-width: 1.5em; min-height: 1.5em; display: flex; align-items: center; justify-content: center;">
+                            {{ unread_messages_count }}
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if draft_articles_count > 0 %}
+                <li class="nav-item me-2">
+                    <a href="{% url 'articles:article_list' %}" class="nav-link position-relative">
+                        <i class="bi bi-file-earmark-text-fill fs-5 text-danger"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="z-index: 1; font-size: 0.75em; padding: .3em .6em; min-width: 1.5em; min-height: 1.5em; display: flex; align-items: center; justify-content: center;">
+                            {{ draft_articles_count }}
+                            <span class="visually-hidden">draft articles</span>
+                        </span>
+                    </a>
+                </li>
+                {% endif %}
+            {% else %}
+            {% if user.author.editor_article and editor_draft_articles_count > 0 %}
+            <li class="nav-item me-2">
+                <a href="{% url 'account:editor_articles' %}" class="nav-link position-relative">
+                    <i class="bi bi-file-earmark-text-fill fs-5 text-danger"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="z-index: 1; font-size: 0.75em; padding: .3em .6em; min-width: 1.5em; min-height: 1.5em; display: flex; align-items: center; justify-content: center;">
+                        {{ editor_draft_articles_count }}
+                        <span class="visually-hidden">taslak makaleler</span>
+                    </span>
+                </a>
+            </li>
+            {% endif %}
+            <li class="nav-item me-2">
+                <a href="{% url 'account:my_articles' %}" class="nav-link position-relative">
+                    <i class="bi bi-envelope-fill fs-5 text-primary"></i>
+                    {% if unread_admin_notes_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="z-index: 1; font-size: 0.75em; padding: .3em .6em; min-width: 1.5em; min-height: 1.5em; display: flex; align-items: center; justify-content: center;">
+                            {{ unread_admin_notes_count }}
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                    {% endif %}
+                </a>
+            </li>
+            {% endif %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'profile_edit' or request.resolver_match.url_name == 'change_password' or request.resolver_match.url_name == 'my_articles' %}active fw-bold{% endif %}" href="#" id="userDropdown" 
+             role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="d-flex align-items-center">
+              {% if user.author.profile_image %}
+                <img src="{{ user.author.profile_image.url }}" class="rounded-circle me-2" width="32" height="32" alt="{{ user.username }}" style="object-fit: cover;">
+              {% else %}
+                <div class="rounded-circle bg-primary bg-opacity-10 d-flex justify-content-center align-items-center me-2" 
+                     style="width: 32px; height: 32px;">
+                  <i class="bi bi-person text-primary"></i>
+                </div>
+              {% endif %}
+              <span>{{ user.username }}<i class="bi bi-caret-down-fill ms-1"></i></span>
+            </div>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="{% url 'account:profile' %}">
+                <i class="bi bi-person-circle me-2"></i>Profilim
+            </a></li>
+            <li><a class="dropdown-item" href="{% url 'account:my_articles' %}">
+                <i class="bi bi-journal-text me-2"></i>Makalelerim
+            </a></li>
+            <li><a class="dropdown-item" href="{% url 'account:change_password' %}">
+                <i class="bi bi-key me-2"></i>Parola Güncelle
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="{% url 'account:logout' %}">
+                <i class="bi bi-box-arrow-right me-2"></i>Çıkış Yap
+            </a></li>
+          </ul>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a href="{% url 'account:login' %}" class="btn btn-outline-primary rounded-pill px-3 me-2">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Giriş Yap
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'account:register' %}" class="btn btn-primary rounded-pill px-3">
+            <i class="bi bi-person-plus me-1"></i>Kayıt Ol
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+</body>
+</html>

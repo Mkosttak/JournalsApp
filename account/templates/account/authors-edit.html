@@ -1,0 +1,211 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}Editör Düzenle{% endblock %}
+
+{% block content %}
+<div class="container py-4 animate__animated animate__fadeIn">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'account:admin_authors' %}" class="text-decoration-none">Editörler</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Editör Düzenle: {{ author.user.username }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="edit-profile-card slide-up">
+                <div class="edit-profile-header">
+                    <h4 class="edit-profile-title">Editör Bilgilerini Düzenle</h4>
+                    <p class="edit-profile-subtitle">Editörün kişisel bilgilerini ve yetkilerini güncelleyin.</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <!-- Profil Fotoğrafı -->
+                    <div class="d-flex justify-content-center mb-4">
+                        <div class="profile-image-upload">
+                            {% if author.profile_image %}
+                                <img src="{{ author.profile_image.url }}" alt="Profil Fotoğrafı" class="profile-image">
+                            {% else %}
+                                <div class="profile-image-placeholder" style="width: 100px; height: 100px;">
+                                    <i class="bi bi-person-fill text-primary" style="font-size: 2.5rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="image-upload-overlay">
+                                <label for="id_profile_image" class="stretched-link" style="cursor: pointer;">
+                                    <i class="bi bi-camera-fill"></i>
+                                </label>
+                            </div>
+                        </div>
+                        {% if author.resume %}
+                            <div class="flex-grow-1 ms-4">
+                                <a href="{{ author.resume.url }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill">
+                                    <i class="bi bi-file-earmark-text me-2"></i>Güncel CV'yi Görüntüle
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" class="fade-in">
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                {% for field in user_form %}
+                                    {% include 'partials/_form_field.html' with form_field=field %}
+                                {% endfor %}
+
+                                <!-- Bio Field -->
+                                {% include 'partials/_form_field.html' with form_field=author_form.bio %}
+
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Resume and Is Approved Fields -->
+                                {% include 'partials/_form_field.html' with form_field=author_form.resume %}
+
+                                <div class="mb-4 form-group">
+                                    <label for="{{ author_form.is_approved.id_for_label }}" class="form-label fw-medium">Bu kullanıcı editör olsun mu?</label>
+                                    <div class="form-check form-switch">
+                                        {{ author_form.is_approved }}
+                                        <label class="form-check-label" for="{{ author_form.is_approved.id_for_label }}">
+                                            {% if author.is_approved %}Evet{% else %}Hayır{% endif %}
+                                        </label>
+                                        <div class="form-text text-muted small mt-1">{{ author_form.is_approved.help_text|safe }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 mt-4 justify-content-center">
+                            <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+                                <i class="bi bi-check-lg me-2"></i>Değişiklikleri Kaydet
+                            </button>
+                            <a href="{% url 'account:admin_authors' %}" class="btn btn-light px-4 py-2 rounded-pill">
+                                <i class="bi bi-x-lg me-2"></i>İptal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* General card styling from profile_edit.html */
+.card {
+    border-radius: 1rem;
+}
+
+/* Form control focus styling from profile_edit.html */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Button styling from profile_edit.html */
+.btn {
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Profile image upload specific styles from profile_edit.html */
+.profile-image-upload {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-upload-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    text-align: center;
+    padding: 0.25rem 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.profile-image-upload:hover .image-upload-overlay {
+    opacity: 1;
+}
+
+.profile-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9ecef;
+    border-radius: 50%; /* Ensure placeholder is also circular if image is */
+}
+
+/* Edit profile card specific styles from profile_edit.html */
+.edit-profile-card {
+    background-color: #fff;
+    border-radius: 0.75rem; /* 12px */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden; /* Ensures child elements like header don't break border radius */
+}
+
+.edit-profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Example gradient */
+    color: white;
+    padding: 1.5rem; /* 24px */
+    text-align: center;
+}
+
+.edit-profile-title {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 600;
+    margin-bottom: 0.25rem; /* 4px */
+}
+
+.edit-profile-subtitle {
+    font-size: 0.875rem; /* 14px */
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 768px) {
+    .edit-profile-header {
+        padding: 1rem;
+    }
+    .edit-profile-title {
+        font-size: 1.25rem;
+    }
+    .card-body {
+        padding: 1.5rem !important; /* Ensure this doesn't conflict with other paddings */
+    }
+    .d-flex.gap-3.mt-4 { /* Target the button container */
+        flex-direction: column;
+    }
+    .d-flex.gap-3.mt-4 .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

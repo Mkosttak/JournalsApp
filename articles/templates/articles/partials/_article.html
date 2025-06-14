@@ -1,0 +1,26 @@
+{% load static %}
+<div class="card mb-3">
+    <div class="row">
+        <div class="col-4">
+            <img class="img-fluid rounded-start" src="{{ article.image.url }}" alt="{{ article.title }}">
+        </div>
+        <div class="col-8">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url 'articles:article_details' article.slug %}">
+                    {{ article.title }}
+                </a>
+                </h5>
+                <p class="card-text">{{ article.description|truncatechars:15 }}</p>
+                <span>
+                    {% if article.isUpdate %}
+                    	<span class="badge bg-success">Güncellendi</span>
+                    {% else %}
+                        <span class="badge bg-warning">Güncelleme bekliyor.</span>
+                    {% endif %}
+                </span>
+                <p>{{ article.date|date:'SHORT_DATE_FORMAT' }}</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block page_title %}Makale Sil{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'pages:index' %}" class="text-decoration-none">Makaleler</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'articles:article_list' %}" class="text-decoration-none">Makale Listesi</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Makale Sil</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-12">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-gradient bg-danger text-white border-0 py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
+                        <h5 class="card-title mb-0">Makale Silme Onayı</h5>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="alert alert-danger d-flex align-items-start gap-2 shadow-sm">
+                        <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                        <div>
+                            <strong>Dikkat!</strong>
+                            <p class="mb-0 mt-1">"{{ article.title }}" isimli makaleyi silmek üzeresiniz. Bu işlem geri alınamaz.</p>
+                        </div>
+                    </div>
+
+                    <form action="{% url 'articles:article_delete' article.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'articles:article_list' %}" class="btn btn-light px-4 rounded-pill">
+                                <i class="bi bi-x-circle me-1"></i> Vazgeç
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4 py-2 rounded-pill shadow-sm">
+                                <i class="bi bi-trash me-1"></i> Makaleyi Sil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+}
+
+.card-header {
+    background: linear-gradient(45deg, #dc3545, #b02a37);
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .d-grid.gap-2 {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

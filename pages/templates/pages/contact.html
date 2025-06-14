@@ -1,0 +1,96 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}
+    İletişim
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="card-title text-center mb-4">Bizimle İletişime Geçin</h1>
+                    <p class="text-center text-muted mb-4">
+                        Herhangi bir sorunuz, öneriniz veya sorununuz varsa aşağıdaki formu doldurarak bize ulaşabilirsiniz.
+                    </p>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="text"
+                                   class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                   id="{{ form.name.id_for_label }}"
+                                   name="{{ form.name.html_name }}"
+                                   placeholder="{{ form.name.field.widget.attrs.placeholder }}"
+                                   {% if form.name.value %}value="{{ form.name.value }}"{% endif %}
+                                   {% if form.name.field.required %}required{% endif %}
+                            >
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <input type="email"
+                                   class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                   id="{{ form.email.id_for_label }}"
+                                   name="{{ form.email.html_name }}"
+                                   placeholder="{{ form.email.field.widget.attrs.placeholder }}"
+                                   {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
+                                   {% if form.email.field.required %}required{% endif %}
+                            >
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <input type="text"
+                                   class="form-control {% if form.subject.errors %}is-invalid{% endif %}"
+                                   id="{{ form.subject.id_for_label }}"
+                                   name="{{ form.subject.html_name }}"
+                                   placeholder="{{ form.subject.field.widget.attrs.placeholder }}"
+                                   {% if form.subject.value %}value="{{ form.subject.value }}"{% endif %}
+                                   {% if form.subject.field.required %}required{% endif %}
+                            >
+                            {% if form.subject.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.subject.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control {% if form.message.errors %}is-invalid{% endif %}"
+                                      id="{{ form.message.id_for_label }}"
+                                      name="{{ form.message.html_name }}"
+                                      placeholder="{{ form.message.field.widget.attrs.placeholder }}"
+                                      rows="{{ form.message.field.widget.attrs.rows }}"
+                                      {% if form.message.field.required %}required{% endif %}
+                            >{{ form.message.value|default_if_none:"" }}</textarea>
+                            {% if form.message.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.message.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Mesajı Gönder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

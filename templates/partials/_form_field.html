@@ -1,0 +1,127 @@
+{% load widget_tweaks %}
+
+<div class="mb-4 form-group {% if form_field.errors %}is-invalid{% endif %}">
+    {% if form_field.errors %}
+    <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-3 border-0 shadow-sm" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+            <div>{{ form_field.errors }}</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if form_field.name == 'categories' %}
+    <label for="{{ form_field.id_for_label }}" class="form-label fw-medium">
+        {{ form_field.label }}
+        {% if form_field.field.required %}
+        <span class="text-danger">*</span>
+        {% endif %}
+    </label>
+    <div class="input-group">
+        {{ form_field }}
+        {% if user.is_superuser %}
+        <button type="button" class="btn btn-primary" id="showAddCategoryModalBtn">Yeni Kategori Ekle</button>
+        {% endif %}
+    </div>
+    {% else %}
+    <label for="{{ form_field.id_for_label }}" class="form-label fw-medium">
+        {{ form_field.label }}
+        {% if form_field.field.required %}
+        <span class="text-danger">*</span>
+        {% endif %}
+    </label>
+
+    {% if form_field.field.widget.input_type == 'checkbox' %}
+    <div class="form-check form-switch mb-4">
+        {{ form_field|add_class:"form-check-input"|attr:"autocomplete:off" }}
+        <label class="form-check-label" for="{{ form_field.id_for_label }}" role="switch">
+        </label>
+        {% if form_field.help_text %}
+        <small class="form-text text-muted d-block mt-1">{{ form_field.help_text|safe }}</small>
+        {% endif %}
+    </div>
+    {% elif form_field.field.widget.input_type == 'radio' %}
+    <div class="form-check">
+        {{ form_field|attr:"autocomplete:off" }}
+        <label class="form-check-label" for="{{ form_field.id_for_label }}">
+            {{ form_field.help_text|safe }}
+        </label>
+    </div>
+    {% elif form_field.field.widget.input_type == 'file' %}
+    <div class="input-group">
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-file-earmark-arrow-up"></i>
+        </span>
+        <label for="{{ form_field.id_for_label }}" class="form-control file-input-label rounded-end-pill border">
+            <span class="file-input-placeholder d-block text-truncate">
+                {% if form_field.value %}
+                    Şu anki: {{ form_field.file_display_name }}
+                {% else %}
+                    Dosya seçilmedi
+                {% endif %}
+            </span>
+        </label>
+        <input type="file" name="{{ form_field.name }}" id="{{ form_field.id_for_label }}" class="d-none" {% if form_field.field.required %} required{% endif %} accept=".pdf">
+    </div>
+    <div class="form-text text-muted small mt-1">{{ form_field.help_text|safe }}</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('{{ form_field.id_for_label }}');
+            if (fileInput) {
+                const fileInputLabel = fileInput.previousElementSibling;
+                fileInput.addEventListener('change', function() {
+                    if (this.files && this.files.length > 0) {
+                        fileInputLabel.querySelector('.file-input-placeholder').textContent = this.files[0].name;
+                    } else {
+                        fileInputLabel.querySelector('.file-input-placeholder').textContent = 'Dosya seçilmedi';
+                    }
+                });
+            }
+        });
+    </script>
+    {% elif form_field.name == 'content' or form_field.name == 'body' or form_field.name == 'description' or form_field.name == 'admin_note' or 'text' in form_field.field.widget.attrs.class %}
+    {{ form_field|add_class:"rounded-3 border shadow-sm"|attr:"autocomplete:off" }}
+    <div class="form-text text-muted small mt-1">{{ form_field.help_text|safe }}</div>
+    {% else %}
+    <div class="input-group">
+        {% if 'email' in form_field.name %}
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-envelope"></i>
+        </span>
+        {% elif 'password' in form_field.name %}
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-lock"></i>
+        </span>
+        {% elif 'user' in form_field.name or 'name' in form_field.name %}
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-person"></i>
+        </span>
+        {% elif 'phone' in form_field.name %}
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-telephone"></i>
+        </span>
+        {% elif 'date' in form_field.name %}
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-calendar"></i>
+        </span>
+        {% elif 'time' in form_field.name %}
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-clock"></i>
+        </span>
+        {% elif 'url' in form_field.name or 'link' in form_field.name %}
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-link"></i>
+        </span>
+        {% else %}
+        <span class="input-group-text bg-light border rounded-start-pill">
+            <i class="bi bi-pencil"></i>
+        </span>
+        {% endif %}
+        {{ form_field|add_class:"rounded-end-pill border"|attr:"autocomplete:off" }}
+    </div>
+    <div class="form-text text-muted small mt-1">{{ form_field.help_text|safe }}</div>
+    {% endif %}
+    {% endif %}
+</div>

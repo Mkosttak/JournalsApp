@@ -1,0 +1,72 @@
+{% load static %}
+<footer class="bg-dark text-white-50 py-5 mt-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="bi bi-journal-text fs-3 me-2 text-primary"></i>
+                    <h5 class="mb-0 fw-bold text-white">ArticlesApp</h5>
+                </div>
+                <p>Modern ve kullanıcı dostu makale platformu. Düşüncelerinizi paylaşın, bilgi edinin ve topluluğa katılın.</p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="#" class="text-white-50 hover-primary"><i class="bi bi-facebook fs-5"></i></a>
+                    <a href="#" class="text-white-50 hover-primary"><i class="bi bi-twitter-x fs-5"></i></a>
+                    <a href="#" class="text-white-50 hover-primary"><i class="bi bi-instagram fs-5"></i></a>
+                    <a href="#" class="text-white-50 hover-primary"><i class="bi bi-linkedin fs-5"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h5 class="fw-bold mb-4 text-white">Hızlı Bağlantılar</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/" class="text-white-50 text-decoration-none hover-primary">Ana Sayfa</a></li>
+                    <li class="mb-2"><a href="{% url 'pages:index' %}" class="text-white-50 text-decoration-none hover-primary">Makaleler</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-primary">Kategoriler</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-primary">Hakkımızda</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-primary">İletişim</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h5 class="fw-bold mb-4 text-white">İletişim</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-3 text-primary fs-5"></i>
+                        <span>İstanbul, Türkiye</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-envelope me-3 text-primary fs-5"></i>
+                        <span>info@articlesapp.com</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-telephone me-3 text-primary fs-5"></i>
+                        <span>+90 212 123 4567</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <h5 class="fw-bold mb-4 text-white">Bülten</h5>
+                <p>En son makalelerden ve güncellemelerden haberdar olmak için bültenimize abone olun.</p>
+                <div class="input-group mt-3">
+                    <input type="email" class="form-control rounded-start" placeholder="E-posta adresiniz" aria-label="E-posta adresiniz">
+                    <button class="btn btn-primary rounded-end" type="button">Abone Ol</button>
+                </div>
+            </div>
+        </div>
+        <hr class="my-5 border-secondary">
+        <div class="row">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0">&copy; {% now "Y" %} ArticlesApp. Tüm hakları saklıdır.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <p class="mb-0">Gizlilik Politikası | Kullanım Şartları</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+/* Custom hover effect for footer links */
+.hover-primary:hover {
+    color: var(--bs-primary) !important; /* Use Bootstrap primary color */
+    transition: color 0.3s ease-in-out;
+}
+</style>

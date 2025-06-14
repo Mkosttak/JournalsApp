@@ -1,0 +1,159 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}Admin Editörler{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-12 col-12">
+            <nav aria-label="breadcrumb" class="mb-4 d-flex justify-content-between align-items-center">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'pages:index' %}" class="text-decoration-none">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Admin Editörler</li>
+                </ol>
+                <!-- Arama Kutusu -->
+                <form method="GET" class="mb-0 d-flex">
+                    <div class="input-group input-group-sm rounded-pill border">
+                        <span class="input-group-text bg-transparent border-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Editör ara..." value="{{ request.GET.q }}">
+                        <button class="btn btn-primary btn-sm rounded-pill ms-2" type="submit">Ara</button>
+                    </div>
+                </form>
+            </nav>
+
+            <div class="card shadow rounded-4 border-0">
+                <div class="card-header bg-primary text-white text-center rounded-top-4 d-flex justify-content-between align-items-center py-3">
+                    <h4 class="mb-0"><i class="bi bi-people-fill me-2"></i>Admin Editörler</h4>
+                    <div class="d-flex align-items-center">
+                        {# Yeni Editör Ekle butonu, eğer isterseniz aktif edilebilir #}
+                        {# <a href="#" class="btn btn-light btn-sm rounded-pill px-3 shadow-sm me-3"><i class="bi bi-person-plus-fill me-1"></i> Yeni Editör Ekle</a> #}
+                        <!-- Arama Kutusu kaldırıldı -->
+                        
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Arama kutusu kaldırıldı -->
+
+                    {% if authors %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Ad Soyad</th>
+                                    <th scope="col">Kullanıcı Adı</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col" class="text-center">Makale Sayısı</th>
+                                    <th scope="col" class="text-center">Onay Durumu</th>
+                                    <th scope="col" class="text-center">Editör Makaleleri</th>
+                                    <th scope="col" class="text-center">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for author in authors %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if author.profile_image %}
+                                                <img src="{{ author.profile_image.url }}" class="rounded-circle me-2" width="32" height="32" alt="{{ author.full_name }}" style="object-fit: cover;">
+                                            {% else %}
+                                                <div class="profile-image-placeholder rounded-circle me-2 d-inline-flex align-items-center justify-content-center bg-secondary-subtle text-secondary" style="width: 32px; height: 32px;">
+                                                    <i class="bi bi-person-fill" style="font-size: 1rem;"></i>
+                                                </div>
+                                            {% endif %}
+                                            <span>{{ author.full_name|default:"-" }}</span>
+                                        </div>
+                                    </td>
+                                    <td>@{{ author.user.username }}</td>
+                                    <td>{{ author.user.email }}</td>
+                                    <td class="text-center">{{ author.article_count }}</td>
+                                    <td class="text-center">
+                                        {% if author.is_approved %}
+                                            <span class="badge bg-success-subtle text-success-emphasis rounded-pill"><i class="bi bi-check-circle-fill me-1"></i>Onaylandı</span>
+                                        {% else %}
+                                            <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill"><i class="bi bi-check-circle-fill me-1"></i>Onay Bekliyor</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if author.editor_article %}
+                                            <span class="badge bg-info-subtle text-info-emphasis rounded-pill"><i class="bi bi-check-circle-fill me-1"></i>Editor</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill"><i class="bi bi-hourglass-split me-1"></i>-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'account:authors_edit' author.id %}" class="btn btn-sm btn-info me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Sil" onclick="confirmDelete('{{ author.id }}', '{{ author.user.username }}')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning text-center rounded-3 shadow-sm border-0" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Henüz kayıtlı editör bulunmamaktadır.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Editör Silme Onay Modalı -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Silme Onayı</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>"<strong id="itemNameToDelete"></strong>" kullanıcısını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form action="{% url 'account:author_delete' 0 %}" method="POST" id="deleteItemForm" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js_files %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+
+    const confirmDeleteModalElement = document.getElementById('confirmDeleteModal');
+    const confirmDeleteModalInstance = new bootstrap.Modal(confirmDeleteModalElement);
+
+    function confirmDelete(itemId, itemName) {
+        document.getElementById('itemNameToDelete').innerText = itemName;
+        const deleteForm = document.getElementById('deleteItemForm');
+        deleteForm.action = deleteForm.action.replace('/0/', '/' + itemId + '/');
+        confirmDeleteModalInstance.show();
+    }
+</script>
+{% endblock %}

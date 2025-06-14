@@ -1,0 +1,164 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'articles/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'pages:index' %}" class="text-decoration-none">Makaleler</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ article.title }}</li>
+        </ol>
+    </nav>
+
+    {% if article.admin_note %}
+    <div class="d-flex align-items-center bg-info-subtle text-info-emphasis rounded-3 p-3 mt-2 mb-4 small border-start border-info border-4">
+        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+        <strong>Yönetici Notu:</strong> {{ article.admin_note }}
+    </div>
+    {% endif %}
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h1 class="h2 mb-3">{{ article.title }}</h1>
+                    <div class="d-flex align-items-center gap-3 text-muted mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-calendar3 me-2"></i>
+                            <span>{{ article.created_at|date:"d M Y" }}</span>
+                        </div>
+                        {% if article.categories.all %}
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-tags-fill me-2"></i>
+                            {% for category in article.categories.all %}
+                            <span class="badge bg-primary rounded-pill me-1">
+                                {{ category.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="d-flex align-items-center text-muted">
+                            <i class="bi bi-tags-fill me-2"></i>
+                            <span>Kategori Yok</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if user.is_authenticated and user == article.author or user.is_superuser %}
+                <div class="dropdown">
+                    <button class="btn btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li>
+                            <a href="{% url 'articles:article_edit' article.id %}" class="dropdown-item">
+                                <i class="bi bi-pencil-square me-2"></i>Düzenle
+                            </a>
+                        </li>
+                        {% if user.is_superuser %}
+                        <li>
+                            <a href="{% url 'articles:article_delete' article.id %}" class="dropdown-item text-danger" 
+                               onclick="return confirm('Bu makale silinsin mi?');">
+                                <i class="bi bi-trash me-2"></i>Sil
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <h5 class="d-flex align-items-center mb-3">
+                    <i class="bi bi-person me-2 text-primary"></i>
+                    Yazar
+                </h5>
+                <div class="d-flex align-items-center">
+                    {% if article.author %}
+                        <a href="{% url 'account:author_detail' article.author.id %}" 
+                           class="badge bg-primary bg-opacity-10 text-primary text-decoration-none px-3 py-2 rounded-pill">
+                            <i class="bi bi-person me-1"></i>
+                            {{ article.author.get_full_name|default:article.author.username }}
+                        </a>
+                    {% else %}
+                        <span class="text-muted">Yazar belirtilmemiş</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if article.keywords %}
+            <div class="mb-4">
+                <h5 class="d-flex align-items-center mb-3">
+                    <i class="bi bi-key me-2 text-primary"></i>
+                    Anahtar Kelimeler
+                </h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for keyword in article.keyword_list %}
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
+                            {{ keyword }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <h5 class="d-flex align-items-center mb-3">
+                    <i class="bi bi-file-text me-2 text-primary"></i>
+                    Açıklama
+                </h5>
+                <div class="card bg-light border-0">
+                    <div class="card-body">
+                        {{ article.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
+
+            {% if article.file %}
+            <div class="mb-4">
+                <h5 class="d-flex align-items-center mb-3">
+                    <i class="bi bi-file-pdf me-2 text-danger"></i>
+                    PDF Dosyası
+                </h5>
+                <a href="{{ article.file.url }}" target="_blank" class="btn btn-outline-danger">
+                    <i class="bi bi-file-pdf me-2"></i>PDF'i Görüntüle
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 1rem;
+}
+
+.badge {
+    font-weight: 500;
+}
+
+.dropdown-menu {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.dropdown-item.text-danger:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+</style>
+{% endblock %}

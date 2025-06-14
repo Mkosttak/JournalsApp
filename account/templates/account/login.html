@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block css_file %}
+    <link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}Giriş Yap{% endblock %}
+
+{% block content %}
+<div class="container py-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7 col-12">
+            <div class="auth-card slide-up">
+                <div class="auth-header">
+                    <h2 class="auth-title">Giriş Yap</h2>
+                    <p class="auth-subtitle">Hesabınıza giriş yaparak makalelerinizi yönetin</p>
+                </div>
+                <div class="auth-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% include 'partials/_form.html' %}
+                        <button class="btn btn-primary w-100 mt-4 py-2" type="submit">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Giriş Yap
+                        </button>
+                    </form>
+                </div>
+                <div class="auth-footer">
+                    <p class="auth-footer-text">Hesabınız yok mu? <a href="{% url 'account:register' %}" class="auth-footer-link">Kayıt Ol</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_files %}
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

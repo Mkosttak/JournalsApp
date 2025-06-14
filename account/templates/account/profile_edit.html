@@ -1,0 +1,615 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}Profili Düzenle{% endblock %}
+
+{% block content %}
+<div class="container py-4 animate__animated animate__fadeIn">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'account:profile' %}" class="text-decoration-none">Profilim</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Profili Düzenle</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden slide-up">
+                <div class="card-header bg-gradient bg-primary text-white border-0 py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-circle fs-4 me-2"></i>
+                        <h5 class="card-title mb-0">Profil Bilgilerini Düzenle</h5>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" class="fade-in">
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <!-- Profile Image Upload Section -->
+                                <div class="mb-4">
+                                    <label for="{{ author_form.profile_image.id_for_label }}" class="form-label fw-medium">Profil Fotoğrafı *</label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="profile-image-preview-container">
+                                            {% if author.profile_image and author.profile_image.name != "author_profiles/default.png" %}
+                                                <img src="{{ author.profile_image.url }}" alt="Profil Fotoğrafı" class="profile-image-preview" id="profile-image-preview" data-original-image-url="{{ author.profile_image.url }}">
+                                            {% else %}
+                                                <div class="profile-image-placeholder-large d-inline-flex align-items-center justify-content-center bg-secondary text-white" id="profile-image-preview-placeholder">
+                                                    <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div class="image-upload-overlay-icon" id="change-profile-image-btn">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex flex-column gap-2">
+                                                <label for="{{ author_form.profile_image.id_for_label }}" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
+                                                    <i class="bi bi-upload me-1"></i> <span id="change-profile-image-btn-text">{% if author.profile_image and author.profile_image.name != "author_profiles/default.png" %}Değiştir{% else %}Yükle{% endif %}</span>
+                                                </label>
+                                                {% if author.profile_image and author.profile_image.name != "author_profiles/default.png" %}
+                                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill mt-2" id="clear-profile-image-btn" data-bs-toggle="tooltip">
+                                                        <i class="bi bi-trash me-1"></i> Sil
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                            <input type="file" name="{{ author_form.profile_image.name }}" id="{{ author_form.profile_image.id_for_label }}" {% if author_form.profile_image.field.required %} required{% endif %} class="d-none" accept="image/jpeg,image/jpg,image/png,image/gif">
+                                            <input type="hidden" name="clear_profile_image" id="clear-profile-image-input" value="false">
+                                            <div class="form-text text-muted small mt-1">{{ author_form.profile_image.help_text|safe }}</div>
+                                            {% for error in author_form.profile_image.errors %}
+                                                <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% include 'partials/_form.html' with form=user_form %}
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Bio Field -->
+                                <div class="mb-4">
+                                    <label for="{{ author_form.bio.id_for_label }}" class="form-label fw-medium">Biyografi</label>
+                                    {{ author_form.bio }}
+                                    <div class="form-text text-muted small mt-1">{{ author_form.bio.help_text|safe }}</div>
+                                    {% for error in author_form.bio.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Resume File Upload Section -->
+                                <div class="mb-4">
+                                    <label for="{{ author_form.resume.id_for_label }}" class="form-label fw-medium">CV</label>
+                                    <div class="custom-file-upload-wrapper">
+                                        <div class="d-flex align-items-center mb-2 current-file-display p-3 border rounded-pill bg-light-subtle shadow-sm" id="cv-display-container">
+                                            <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-3"></i>
+                                            <div class="flex-grow-1">
+                                                {% if author.resume %}
+                                                    <a href="{{ author.resume.url }}" target="_blank" class="text-decoration-none" id="current-resume-link">
+                                                        <span class="fw-bold d-block text-truncate" id="current-resume-name" data-original-name="Şu anki: {{ author_form.get_resume_file_display_name }}" style="max-width: 90%; cursor: pointer;">Şu anki: {{ author_form.get_resume_file_display_name }}</span>
+                                                    </a>
+                                                {% else %}
+                                                    <span class="fw-bold d-block text-truncate" id="current-resume-name" data-original-name="CV silindi" style="max-width: 90%;">Mevcut CV Yok</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="d-flex gap-2" id="cv-buttons-container">
+                                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" id="change-resume-btn" data-bs-toggle="tooltip">
+                                                <i class="bi bi-upload me-1"></i> <span id="change-resume-btn-text">{% if author.resume %}CV Güncelle{% else %}CV Ekle{% endif %}</span>
+                                            </button>
+                                            {% if author.resume %}
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill" id="clear-resume-btn" data-bs-toggle="tooltip" title="CV'nizi silin">
+                                                    <i class="bi bi-trash me-1"></i> CV Sil
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                        <input type="file" name="{{ author_form.resume.name }}" id="{{ author_form.resume.id_for_label }}" {% if author_form.resume.field.required %} required{% endif %} class="d-none form-control" accept=".pdf">
+                                        <input type="hidden" name="clear_resume" id="clear-resume-input" value="false">
+                                    </div>
+                                    <div class="form-text text-muted small mt-1">
+                                        {% if author_form.resume.help_text %}
+                                            {{ author_form.resume.help_text|safe }}
+                                        {% else %}
+                                            Sadece PDF dosyaları kabul edilmektedir.
+                                        {% endif %}
+                                    </div>
+                                    {% for error in author_form.resume.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                {% if user.is_superuser %}
+                                    <div class="mb-4 form-group">
+                                        <label for="{{ author_form.is_approved.id_for_label }}" class="form-label fw-medium">Editör sayfasında görünlensin mi?</label>
+                                        <div class="form-check form-switch">
+                                            {{ author_form.is_approved }}
+                                            <label class="form-check-label" for="{{ author_form.is_approved.id_for_label }}">
+                                                {% if author.is_approved %}Evet, Görünsün{% else %}Hayır, Görünmesin{% endif %}
+                                            </label>
+                                            <div class="form-text text-muted small mt-1">{{ author_form.is_approved.help_text|safe }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 mt-4 justify-content-center">
+                            <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm" id="save-changes-btn">
+                                <i class="bi bi-check-lg me-2"></i>Değişiklikleri Kaydet
+                            </button>
+                            <a href="{% url 'account:profile' %}" class="btn btn-light px-4 py-2 rounded-pill">
+                                <i class="bi bi-x-lg me-2"></i>İptal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOMContentLoaded fired in profile_edit.html");
+        try {
+            // JavaScript for file change buttons
+            document.querySelectorAll('.file-change-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.dataset.targetId;
+                    const fileInput = document.getElementById(targetId);
+                    if (fileInput) {
+                        fileInput.click();
+                    }
+                });
+            });
+
+            // JavaScript for profile image preview
+            const profileImageInput = document.getElementById('{{ author_form.profile_image.id_for_label }}');
+            let profileImagePreview = document.getElementById('profile-image-preview'); // Use let here
+            const profileImagePreviewContainer = document.querySelector('.profile-image-preview-container');
+            const profileImagePreviewPlaceholder = document.getElementById('profile-image-preview-placeholder');
+            const initialProfileImageUrl = profileImagePreview ? profileImagePreview.src : null; // Store initial URL
+
+            // NEW: Default profile image path
+            const defaultProfileImagePath = "{% static 'author_profiles/default.png' %}";
+            const initialProfileImageName = "{{ author.profile_image.name|default:'author_profiles/default.png' }}";
+
+            // Event listener for the camera icon button
+            const changeProfileImageBtn = document.getElementById('change-profile-image-btn');
+            if (changeProfileImageBtn) {
+                changeProfileImageBtn.addEventListener('click', function() {
+                    profileImageInput.click();
+                });
+            }
+
+            profileImageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (profileImagePreviewPlaceholder) {
+                            profileImagePreviewPlaceholder.style.display = 'none'; // Hide placeholder
+                        }
+                        if (!profileImagePreview) {
+                            // Create img element if it doesn't exist
+                            profileImagePreview = document.createElement('img');
+                            profileImagePreview.id = 'profile-image-preview';
+                            profileImagePreview.className = 'profile-image-preview';
+                            profileImagePreviewContainer.appendChild(profileImagePreview);
+                        }
+                        profileImagePreview.src = e.target.result;
+                        profileImagePreview.style.display = 'block'; // Show image
+
+                        // Update button texts and visibility for image upload
+                        document.getElementById('change-profile-image-btn-text').textContent = 'Fotoğrafı Değiştir';
+                        if (clearProfileImageBtn) clearProfileImageBtn.style.display = 'inline-block';
+                        if (clearProfileImageInput) clearProfileImageInput.value = 'false'; // Ensure clear is false if new file is selected
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // If file is cleared (e.g., user cancels file selection dialog)
+                    // Revert to initial image or placeholder if no image was selected
+                    if (initialProfileImageName && initialProfileImageName !== "author_profiles/default.png") {
+                        if (profileImagePreview) {
+                            profileImagePreview.src = initialProfileImageUrl;
+                            profileImagePreview.style.display = 'block';
+                        }
+                        if (profileImagePreviewPlaceholder) {
+                            profileImagePreviewPlaceholder.style.display = 'none';
+                        }
+                        document.getElementById('change-profile-image-btn-text').textContent = 'Fotoğrafı Değiştir';
+                        if (clearProfileImageBtn) clearProfileImageBtn.style.display = 'inline-block';
+                    } else {
+                        // No initial image or it was default, so show placeholder
+                        if (profileImagePreview) {
+                            profileImagePreview.style.display = 'none';
+                            if (profileImagePreview.parentNode === profileImagePreviewContainer && profileImagePreview.id === 'profile-image-preview') {
+                                profileImagePreviewContainer.removeChild(profileImagePreview);
+                                profileImagePreview = null; // Clear reference
+                            }
+                        }
+                        if (profileImagePreviewPlaceholder) {
+                            profileImagePreviewPlaceholder.style.display = 'flex';
+                        }
+                        document.getElementById('change-profile-image-btn-text').textContent = 'Fotoğraf Yükle';
+                        if (clearProfileImageBtn) clearProfileImageBtn.style.display = 'none';
+                    }
+                    if (clearProfileImageInput) clearProfileImageInput.value = 'false';
+                }
+            });
+
+            // Handle cancel button for profile image
+            const cancelButton = document.querySelector(`a[href="{% url 'account:profile' %}"]`);
+            if (cancelButton) {
+                cancelButton.addEventListener('click', function(event) {
+                    // Reset the file input to clear selected file
+                    profileImageInput.value = '';
+                    if (clearProfileImageInput) {
+                        clearProfileImageInput.value = 'false';
+                    }
+
+                    // Revert profile image preview to initial state
+                    if (initialProfileImageName && initialProfileImageName !== "author_profiles/default.png") {
+                        if (profileImagePreview) {
+                            profileImagePreview.src = initialProfileImageUrl;
+                            profileImagePreview.style.display = 'block';
+                        }
+                        if (profileImagePreviewPlaceholder) {
+                            profileImagePreviewPlaceholder.style.display = 'none';
+                        }
+                        document.getElementById('change-profile-image-btn-text').textContent = 'Fotoğrafı Değiştir';
+                        if (clearProfileImageBtn) clearProfileImageBtn.style.display = 'inline-block';
+                    } else {
+                        if (profileImagePreview) {
+                            profileImagePreview.style.display = 'none';
+                            // If a new image was uploaded and then cancelled, remove the created img element
+                            if (profileImagePreview.parentNode === profileImagePreviewContainer && profileImagePreview.id === 'profile-image-preview') {
+                                profileImagePreviewContainer.removeChild(profileImagePreview);
+                                profileImagePreview = null; // Clear reference
+                            }
+                        }
+                        if (profileImagePreviewPlaceholder) {
+                            profileImagePreviewPlaceholder.style.display = 'flex';
+                        }
+                        document.getElementById('change-profile-image-btn-text').textContent = 'Fotoğraf Yükle';
+                        if (clearProfileImageBtn) clearProfileImageBtn.style.display = 'none';
+                    }
+                    // Do not prevent default for the cancel button, let it navigate
+                });
+            }
+
+            // NEW: JavaScript for Clear Profile Image button
+            const clearProfileImageBtn = document.getElementById('clear-profile-image-btn');
+            const clearProfileImageInput = document.getElementById('clear-profile-image-input');
+            const changeProfileImageBtnText = document.getElementById('change-profile-image-btn-text');
+
+            if (clearProfileImageBtn) {
+                clearProfileImageBtn.addEventListener('click', function() {
+                    if (confirm("Profil fotoğrafınızı silmek istediğinizden emin misiniz?")) {
+                        if (clearProfileImageInput) {
+                            clearProfileImageInput.value = 'true'; // Set the hidden input to clear the image
+                        }
+                        // Visually update to default image
+                        if (profileImagePreview) {
+                            profileImagePreview.style.display = 'none'; // Hide existing img
+                        }
+                        if (profileImagePreviewPlaceholder) {
+                            profileImagePreviewPlaceholder.style.display = 'flex'; // Show placeholder
+                        }
+                        // Hide the clear button and update the change button text
+                        clearProfileImageBtn.style.display = 'none';
+                        if (changeProfileImageBtnText) {
+                            changeProfileImageBtnText.textContent = 'Fotoğraf Yükle';
+                        }
+                        profileImageInput.value = ''; // Clear the file input
+                    }
+                });
+            }
+
+            // JavaScript for CV file handling
+            const resumeInput = document.getElementById('{{ author_form.resume.id_for_label }}');
+            const changeResumeBtn = document.getElementById('change-resume-btn');
+            const clearResumeBtn = document.getElementById('clear-resume-btn');
+            const clearResumeInput = document.getElementById('clear-resume-input');
+            const currentResumeName = document.getElementById('current-resume-name');
+
+            const initialResumeName = currentResumeName ? currentResumeName.dataset.originalName : 'Dosya seçilmedi';
+
+            if (changeResumeBtn) {
+                changeResumeBtn.addEventListener('click', function() {
+                    resumeInput.click();
+                });
+            }
+
+            if (resumeInput) {
+                resumeInput.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        if (currentResumeName) {
+                            currentResumeName.textContent = 'Yeni CV: ' + file.name;
+                            currentResumeName.style.cursor = 'default'; // Make it not clickable until saved
+                            const currentResumeLink = document.getElementById('current-resume-link');
+                            if (currentResumeLink) {
+                                currentResumeLink.removeAttribute('href'); // Remove link
+                                currentResumeLink.style.cursor = 'default';
+                            }
+                        }
+                        // Update button texts and visibility
+                        document.getElementById('change-resume-btn-text').textContent = 'CV Güncelle';
+                        if (clearResumeBtn) clearResumeBtn.style.display = 'inline-block'; // Show clear button
+                        if (clearResumeInput) clearResumeInput.value = 'false'; // Ensure clear_resume is false if a new file is selected
+
+                    } else {
+                        // If file is cleared without selecting a new one (e.g., cancelled file dialog)
+                        if (currentResumeName) {
+                            currentResumeName.textContent = initialResumeName;
+                            currentResumeName.style.cursor = 'pointer'; // Revert cursor if it was a link
+                            const currentResumeLink = document.getElementById('current-resume-link');
+                            if (currentResumeLink && currentResumeLink.dataset.originalHref) {
+                                currentResumeLink.setAttribute('href', currentResumeLink.dataset.originalHref); // Revert link
+                                currentResumeLink.style.cursor = 'pointer';
+                            }
+                        }
+                        // Revert button texts and visibility if original state had a CV
+                        if (initialResumeName !== 'CV silindi') { // If there was an original CV
+                            document.getElementById('change-resume-btn-text').textContent = 'CV Güncelle';
+                            if (clearResumeBtn) clearResumeBtn.style.display = 'inline-block';
+                        } else { // If there was no original CV
+                            document.getElementById('change-resume-btn-text').textContent = 'CV Ekle';
+                            if (clearResumeBtn) clearResumeBtn.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
+            if (clearResumeBtn) {
+                clearResumeBtn.addEventListener('click', function() {
+                    if (confirm("CV'nizi silmek istediğinizden emin misiniz?")) {
+                        if (clearResumeInput) {
+                            clearResumeInput.value = 'true';
+                        }
+                        if (currentResumeName) {
+                            currentResumeName.textContent = 'CV silindi';
+                            currentResumeName.style.cursor = 'default';
+                            const currentResumeLink = document.getElementById('current-resume-link');
+                            if (currentResumeLink) {
+                                currentResumeLink.removeAttribute('href');
+                                currentResumeLink.style.cursor = 'default';
+                            }
+                            // Hide clear button and change update button text
+                            if (clearResumeBtn) clearResumeBtn.style.display = 'none';
+                            document.getElementById('change-resume-btn-text').textContent = 'CV Ekle';
+                        }
+                        // Clear the file input visually, though the hidden input handles the deletion
+                        resumeInput.value = '';
+                    }
+                });
+            }
+            
+            // Tooltips initialization
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+
+            // Explicit form submission for save button
+            const saveChangesBtn = document.getElementById('save-changes-btn');
+            if (saveChangesBtn) {
+                saveChangesBtn.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent default button submit to handle manually
+                    const form = this.closest('form');
+                    if (form) {
+                        form.submit();
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error("Error in DOMContentLoaded:", error);
+        }
+    });
+</script>
+
+<style>
+.edit-profile-card {
+    border-radius: 1rem; /* 16px */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.edit-profile-header {
+    background-color: #f8f9fa; /* Light background for header */
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+}
+
+.edit-profile-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 0.5rem;
+}
+
+.edit-profile-subtitle {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+.profile-image-preview-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #0d6efd; /* Primary color border */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.profile-image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-image-placeholder-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #6c757d;
+    color: #fff;
+    font-size: 3rem;
+}
+
+.image-upload-overlay-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #0d6efd; /* Primary color */
+    color: white;
+    border-radius: 50%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.image-upload-overlay-icon:hover {
+    background-color: #0b5ed7;
+}
+
+.custom-file-upload-wrapper .input-group .form-control {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+.current-file-display {
+    border: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem; /* Daha keskin kenarlar */
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 0.5rem; /* Slightly more rounded buttons */
+    width: auto; /* Allow buttons to size based on content */
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-outline-primary {
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+.form-check-input {
+    margin-top: 0.3rem;
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+}
+
+/* Ensure file input for profile image is hidden when custom display is used */
+#id_profile_image {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Genel form kontrolleri için yuvarlak kenarlar */
+.form-control, .form-select {
+    border-radius: 999px !important; /* Revert to original pill shape as per images */
+}
+
+/* Input Group içindeki ilk form controlü için sol tarafı yuvarlat, sağ tarafı düz */
+.input-group > .form-control:not(:last-child),
+.input-group > .form-select:not(:last-child) {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: 999px !important;
+    border-bottom-left-radius: 999px !important;
+}
+
+/* Input Group text kısmı için sol tarafı yuvarlat, sağ tarafı düz */
+.input-group-text {
+    border-top-left-radius: 999px !important;
+    border-bottom-left-radius: 999px !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+/* Textarea'lar için yuvarlak kenarlar */
+textarea.form-control {
+    border-radius: 1rem !important; /* Biyografi alanı için biraz daha az yuvarlak olabilir */
+}
+
+/* Transitions for smooth effect */
+.form-control,
+.input-group-text,
+.input-group {
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+/* --- FOCUS STYLES --- */
+
+/* Reset default focus outline/shadow for all form controls and input-group-text */
+.form-control:focus,
+.input-group-text:focus {
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Apply box-shadow to the entire input-group when any child is focused */
+.input-group:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Ensure children within a focused input-group get the blue border and remove individual box-shadow */
+.input-group:focus-within .form-control,
+.input-group:focus-within .input-group-text {
+    border: 1px solid #0d6efd !important; /* Explicitly set border to override all others */
+    z-index: 2; /* Ensure they are above default layers if needed */
+    position: relative; /* Needed for z-index to work */
+    box-shadow: none !important; /* Ensure children don't have their own box-shadow */
+}
+
+/* Ensure textarea has the desired focus style (not part of input-group) */
+textarea.form-control:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    outline: 0 !important;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'articles/css/style.css' %}"> {# Keep articles styles if needed #}
+{% endblock %}
+
+{% block page_title %}Yazarlar{% endblock %}
+
+{% block content %}
+<div class="container py-4 animate__animated animate__fadeIn">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0 flex-grow-1">Yazarlarımız</h3>
+        <!-- Arama Kutusu -->
+        <div class="col-md-4 col-lg-3">
+            <form method="GET" class="mb-0">
+                <div class="input-group input-group-sm rounded-pill border">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Yazar adı" value="{{ request.GET.q }}">
+                    <button class="btn btn-outline-primary btn-sm rounded-pill ms-2" type="submit">Ara</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if request.GET.q %}
+        <div class="alert alert-info d-flex align-items-center mb-4 slide-up">
+            <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+            <div>"{{ request.GET.q }}" için <strong>{{ authors|length }}</strong> sonuç bulundu.</div>
+        </div>
+    {% endif %}
+
+    {% if authors %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for author in authors %}
+                <div class="col slide-up">
+                    <div class="card h-100 author-card-hover shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <a href="{% url 'account:author_detail' author.id %}" class="text-decoration-none">
+                                {% if author.profile_image %}
+                                    <img src="{{ author.profile_image.url }}" class="rounded-circle mb-3 shadow" width="100" height="100" alt="{{ author.full_name }}" style="object-fit: cover;">
+                                {% else %}
+                                    <div class="profile-image-placeholder rounded-circle mb-3 shadow d-inline-flex align-items-center justify-content-center bg-secondary text-white" style="width: 100px; height: 100px;">
+                                        <i class="bi bi-person-fill" style="font-size: 3rem;"></i>
+                                    </div>
+                                {% endif %}
+                                <h5 class="card-title text-dark fw-bold mb-1">{{ author.full_name|default:author.user.username }}</h5>
+                            </a>
+                            <a href="{% url 'account:author_detail' author.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <i class="bi bi-person-lines-fill me-1"></i> Profili Gör
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 my-4 slide-up">
+            <div class="mb-3">
+                <i class="bi bi-people-fill text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h5 class="text-muted mb-3">
+                {% if request.GET.q %}
+                    Aramanızla eşleşen yazar bulunamadı.
+                {% else %}
+                    Henüz onaylı yazar bulunmamaktadır.
+                {% endif %}
+            </h5>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.author-card-hover {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.75rem; /* 12px */
+}
+
+.author-card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+}
+
+.modern-card {
+    border-radius: 0.75rem; /* 12px */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.input-group .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+</style>
+{% endblock %}

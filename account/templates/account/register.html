@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% block css_file %}
+    <link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}Kayıt Ol{% endblock %}
+
+{% block content %}
+<div class="container py-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7 col-12">
+            <div class="auth-card slide-up">
+                <div class="auth-header">
+                    <h2 class="auth-title">Kayıt Ol</h2>
+                    <p class="auth-subtitle">Yeni bir hesap oluşturarak makalelerinizi paylaşın</p>
+                </div>
+                <div class="auth-body">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        {% include 'partials/_form.html' %}
+                        <button class="btn btn-primary w-100 mt-4 py-2" type="submit">
+                            <i class="bi bi-person-plus me-2"></i>Kayıt Ol
+                        </button>
+                    </form>
+                </div>
+                <div class="auth-footer">
+                    <p class="auth-footer-text">Zaten hesabınız var mı? <a href="{% url 'account:login' %}" class="auth-footer-link">Giriş Yap</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_files %}
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

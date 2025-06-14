@@ -1,0 +1,228 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'articles/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'account/css/style.css' %}">
+{% endblock %}
+
+{% block page_title %}Makaleler{% endblock %}
+
+{% block content %}
+<div class="container py-5 animate__animated animate__fadeIn">
+    <!-- Üst Başlık ve Arama Alanı -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0 flex-grow-1">Makaleler</h3>
+                <!-- Arama Kutusu -->
+                <div class="col-md-4 col-lg-3 ms-auto">
+                    <form method="GET" class="mb-0">
+                        <div class="input-group input-group-sm rounded-pill border">
+                            <span class="input-group-text bg-transparent border-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Makale ara..." value="{{ request.GET.q }}">
+                            <button class="btn btn-outline-primary btn-sm rounded-pill ms-2" type="submit">Ara</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if request.GET.q %}
+    <div class="alert alert-info d-flex align-items-center mb-4 slide-up shadow-sm">
+        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+        <div>"{{ request.GET.q }}" için <strong>{{ page_obj.object_list|length }}</strong> sonuç bulundu.</div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Sol Sidebar: Kategoriler -->
+        <div class="col-lg-3 mb-4 mb-lg-0">
+            <div class="card modern-card shadow-sm slide-up sticky-lg-top" style="top: 2rem;">
+                <div class="card-header modern-card-header bg-primary text-white rounded-top-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-tags-fill fs-5 me-2"></i>
+                        <h5 class="mb-0">Kategoriler</h5>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% include 'articles/partials/_categories.html' %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ İçerik: Makaleler Grid -->
+        <div class="col-lg-9">
+            <div class="articles-list">
+                {% if page_obj.object_list %}
+                    {% for article in page_obj.object_list %}
+                    <a href="{% url 'articles:article_details' article.slug %}" class="text-decoration-none">
+                    <div class="card modern-card hover-shadow slide-up mb-4" style="cursor: pointer;">
+                        <div class="card-body p-4">
+                            {% if article.category %}
+                            <div class="text-end mb-2">
+                                <span class="badge bg-primary rounded-pill">
+                                    <i class="bi bi-tag-fill me-1"></i>
+                                    {{ article.category.name }}
+                                </span>
+                            </div>
+                            {% endif %}
+                            <h4 class="card-title mb-3 text-dark">{{ article.title }}</h4>
+                            <p class="card-text text-muted mb-3">{{ article.description|truncatechars:250 }}</p>
+                            
+                            {% if article.keywords %}
+                            <div class="mb-3">
+                                {% for keyword in article.keyword_list %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill me-1 mb-1">
+                                        {{ keyword }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-circle text-primary me-2 fs-5"></i>
+                                    <span class="text-muted">
+                                        {% if article.author %}
+                                            {{ article.author.get_full_name|default:article.author.username }}
+                                        {% else %}
+                                            <span class="fst-italic">Belirtilmemiş</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <small class="text-muted d-flex align-items-center">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    {{ article.created_at|date:"d M Y" }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-journal-richtext text-muted" style="font-size: 4rem;"></i>
+                        </div>
+                        <h5 class="text-muted mb-3">
+                            {% if request.GET.q %}
+                                Aramanızla eşleşen makale bulunamadı.
+                            {% else %}
+                                Henüz bu kategoride makale eklenmemiş.
+                            {% endif %}
+                        </h5>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sayfalama -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Sayfalama" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link shadow-sm" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if seciliKategori %}&kategori={{ seciliKategori }}{% endif %}">&laquo; İlk</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link shadow-sm" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if seciliKategori %}&kategori={{ seciliKategori }}{% endif %}">Önceki</a>
+                        </li>
+                    {% endif %}
+
+                    {% for i in page_obj.paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="page-item active"><span class="page-link shadow-sm">{{ i }}</span></li>
+                        {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link shadow-sm" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if seciliKategori %}&kategori={{ seciliKategori }}{% endif %}">{{ i }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link shadow-sm" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if seciliKategori %}&kategori={{ seciliKategori }}{% endif %}">Sonraki</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link shadow-sm" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if seciliKategori %}&kategori={{ seciliKategori }}{% endif %}">Son &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.modern-card {
+    border-radius: 1rem;
+    border: none;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+}
+
+.modern-card-header {
+    border-bottom: none;
+    background: linear-gradient(45deg, #0d6efd, #0a58ca);
+}
+
+.card-title {
+    font-weight: 600;
+    line-height: 1.4;
+    font-size: 1.1rem;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 0.5em 1em;
+}
+
+.input-group .form-control:focus {
+    box-shadow: none;
+    border-color: #0d6efd;
+}
+
+.page-link {
+    border-radius: 0.5rem;
+    margin: 0 3px;
+    border: none;
+    color: #0d6efd;
+    padding: 0.5rem 1rem;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.slide-up {
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 992px) {
+    .sticky-lg-top {
+        position: static !important;
+    }
+}
+</style>
+{% endblock %} 

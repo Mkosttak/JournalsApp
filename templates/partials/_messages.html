@@ -1,0 +1,183 @@
+{% if messages %}
+<div class="message-container">
+    {% for message in messages %}
+    {# " - " içeren mesajları atla, çünkü bunlar Contact modelinin __str__ çıktısı gibi görünüyor #}
+    {% if " - " not in message|stringformat:"s" %}
+    <div class="alert-wrapper animate__animated animate__fadeInDown">
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert">
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <div class="d-flex align-items-center flex-grow-1">
+                    {% if message.tags == 'success' %}
+                    {% elif message.tags == 'error' or message.tags == 'danger' %}
+                    <i class="bi bi-exclamation-triangle-fill me-2 text-danger fs-5"></i>
+                    {% elif message.tags == 'warning' %}
+                    <i class="bi bi-exclamation-circle-fill me-2 text-warning fs-5"></i>
+                    {% elif message.tags == 'info' %}
+                    <i class="bi bi-info-circle-fill me-2 text-info fs-5"></i>
+                    {% else %}
+                    <i class="bi bi-bell-fill me-2 text-secondary fs-5"></i>
+                    {% endif %}
+
+                    <div class="message-content">{{ message }}</div>
+                </div>
+                <button type="button" class="btn-close ms-2 flex-shrink-0" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    {% endif %} {# End if " - " not in message #}
+    {% endfor %}
+</div>
+
+<style>
+.message-container {
+    position: fixed;
+    top: 4.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.alert-wrapper {
+    max-width: 90%;
+    width: 420px;
+    margin-bottom: 0.5rem;
+    pointer-events: none;
+}
+
+.alert {
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0;
+    display: block;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 0.5rem !important;
+    font-weight: 500;
+    pointer-events: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-close {
+    position: static !important;
+    margin: 0 0 0 auto !important;
+    padding: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    pointer-events: auto;
+    opacity: 0.75;
+    transition: opacity 0.2s;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+.alert-success { 
+    background-color: rgba(178, 223, 188, 0.85) !important; 
+    color: #155724 !important; 
+}
+
+.alert-danger,
+.alert-error { 
+    background-color: rgba(241, 176, 183, 0.85) !important; 
+    color: #721c24 !important; 
+}
+
+.alert-warning { 
+    background-color: rgba(255, 229, 158, 0.85) !important; 
+    color: #856404 !important; 
+}
+
+.alert-info { 
+    background-color: rgba(165, 216, 232, 0.85) !important; 
+    color: #0c5460 !important; 
+}
+
+.message-content { 
+    flex: 1;
+    line-height: 1.4;
+}
+
+@media (max-width: 576px) {
+    .message-container { 
+        top: 0.5rem; 
+    }
+    .alert-wrapper { 
+        width: 94%; 
+    }
+    .alert { 
+        font-size: 0.9rem; 
+        padding: 0.7rem 0.9rem; 
+    }
+}
+
+.animate__animated { 
+    animation-duration: 0.5s; 
+    animation-fill-mode: both; 
+}
+
+@keyframes fadeInDown {
+    from { 
+        opacity: 0; 
+        transform: translate3d(0, -1rem, 0); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translate3d(0, 0, 0); 
+    }
+}
+
+.animate__fadeInDown { 
+    animation-name: fadeInDown; 
+}
+
+.alert.auto-dismiss {
+    animation: fadeInDown 0.5s, fadeOutUp 0.5s 4.5s forwards;
+}
+
+@keyframes fadeOutUp {
+    from { 
+        opacity: 1; 
+    }
+    to { 
+        opacity: 0; 
+        transform: translate3d(0, -1rem, 0); 
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.message-container .alert');
+    alerts.forEach(alert => {
+        alert.classList.add('auto-dismiss');
+
+        setTimeout(() => {
+            const wrapper = alert.parentNode;
+            if (wrapper) {
+                wrapper.style.height = alert.offsetHeight + 'px';
+            }
+            
+            setTimeout(() => {
+                if (wrapper) {
+                    wrapper.style.height = '0px';
+                    wrapper.style.marginBottom = '0px';
+                    wrapper.style.transition = 'all 0.5s ease-in-out';
+
+                    setTimeout(() => {
+                        if (wrapper.parentNode) {
+                            wrapper.parentNode.removeChild(wrapper);
+                        }
+                    }, 500);
+                }
+            }, 5000);
+        }, 0);
+    });
+});
+</script>
+{% endif %}
