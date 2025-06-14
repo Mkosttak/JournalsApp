@@ -141,19 +141,23 @@ def article_edit(request, id):
         form = form_class(request.POST, request.FILES, instance=article)
         if form.is_valid():
             print("Form geçerli!")
-            print("Formun cleaned_data:", form.cleaned_data)
+            print("Formun changed_data:", form.changed_data)
+            print("Formun cleaned_data['file']:", form.cleaned_data.get('file'))
             print("Request.FILES:", request.FILES)
 
-            original_admin_note = article.admin_note # Notun orijinal halini al
-
+            # Formdan güncellenmiş nesneyi al (henüz kaydetme)
             updated_article = form.save(commit=False)
-
+            
+            # isHome ve admin_note ile ilgili özel mantıkları buraya ekle
             # Eğer normal bir kullanıcı kendi makalesini düzenliyorsa ve makale yayınlanmışsa,
             # tekrar onaya düşürmek için isHome'u False yap.
-            if request.user == article.author and article.isHome:
+            if request.user == article.author and article.isHome and 'isHome' not in form.changed_data:
                 updated_article.isHome = False
                 messages.info(request, "Makaleniz güncellendi. Yeni değişiklikler editör tarafından incelendikten sonra tekrar yayınlanacaktır.")
             
+            # admin_note'un orijinal halini, veritabanından çekerek al. Bu, güncel form verilerini etkilemez.
+            original_admin_note = Article.objects.get(pk=article.pk).admin_note
+
             # Eğer süperuser veya editör notu güncelliyorsa, okunmadı olarak işaretle
             if request.user.is_superuser or (hasattr(request.user, 'author') and request.user.author.editor_article):
                 if updated_article.admin_note != original_admin_note:
@@ -163,8 +167,11 @@ def article_edit(request, id):
             if request.user == article.author:
                 updated_article.is_admin_note_read_by_author = True
 
+            # Tüm değişiklikleri veritabanına kaydet (dosya dahil)
             updated_article.save()
             form.save_m2m()
+
+            messages.success(request, "Makale başarıyla güncellendi.")
 
             if request.user.is_superuser:
                 return redirect('articles:article_list')
@@ -173,6 +180,10 @@ def article_edit(request, id):
             else:
                 return redirect('account:my_articles')
         else:
+            # Form geçerli değilse hataları kullanıcıya göster
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Lütfen {field} alanını kontrol edin: {error}")
             return render(request, template, {"form": form})
     else:
         form = form_class(instance=article)
