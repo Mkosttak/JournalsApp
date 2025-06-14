@@ -119,7 +119,7 @@
             <i class="bi bi-pencil"></i>
         </span>
         {% endif %}
-        {{ form_field|add_class:"rounded-end-pill border"|attr:"autocomplete:off" }}
+        {{ form_field|add_class:"form-control"|attr:"autocomplete:off" }}
     </div>
     <div class="form-text text-muted small mt-1">{{ form_field.help_text|safe }}</div>
     {% endif %}

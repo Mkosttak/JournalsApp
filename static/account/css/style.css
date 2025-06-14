@@ -293,3 +293,28 @@ textarea.form-control {
     top: 2rem; /* Üst kısımdan ne kadar aşağıda duracağını ayarlar */
     align-self: flex-start; /* Flexbox içinde üste hizalamak için */
 }
+
+.input-group .form-control,
+.input-group .form-control:focus,
+.input-group:focus-within .form-control {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 0.5rem !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background: #fff !important;
+}
+
+.input-group:focus-within {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+    border: 1.5px solid #0d6efd !important;
+    border-radius: 0.5rem !important;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    background: #fff;
+}
+
+.form-control[readonly] {
+    background-color: #f5f6fa !important;
+    cursor: not-allowed;
+    color: #6c757d;
+    opacity: 1;
+}

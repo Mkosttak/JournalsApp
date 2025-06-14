@@ -28,9 +28,11 @@
                         </div>
                         <div class="col-md-8">
                             <h2 class="fw-bold display-5 mb-2">{{ author.full_name|default:author.user.username }}</h2>
-                            
+                            {% if author.bio %}
+                                <p class="author-bio-box text-muted mb-3" style="max-width: 600px;">{{ author.bio }}</p>
+                            {% endif %}
                             {% if author.resume %}
-                                <a href="{{ author.resume.url }}" target="_blank" class="btn btn-primary rounded-pill px-4 py-2">
+                                <a href="{{ author.resume.url }}" target="_blank" class="btn btn-primary rounded-pill px-4 py-2 mb-3 d-block" style="margin-top: 0.5rem; max-width: 250px;">
                                     <i class="bi bi-file-earmark-person me-2"></i> Özgeçmişi Görüntüle
                                 </a>
                             {% endif %}
@@ -68,6 +70,16 @@
 .modern-card {
     border-radius: 1rem; /* 16px */
     overflow: hidden;
+}
+
+.author-bio-box {
+    background: #f5f6fa;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    color: #495057;
+    font-size: 1.05rem;
+    border: 1px solid #f0f1f5;
+    display: inline-block;
 }
 
 .article-list-item {

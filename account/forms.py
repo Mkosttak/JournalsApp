@@ -124,12 +124,12 @@ class UserProfileForm(ModelForm):
         widgets = {
             'first_name': TextInput(attrs={"class": "form-control"}),
             'last_name': TextInput(attrs={"class": "form-control"}),
-            'email': EmailInput(attrs={"class": "form-control"}),
+            'email': EmailInput(attrs={"class": "form-control", "readonly": "readonly"}),
         }
 
 
 class UserUpdateForm(forms.ModelForm):
-    email = forms.EmailField()
+    email = forms.EmailField(widget=EmailInput(attrs={"class": "form-control", "readonly": "readonly"}))
     
     class Meta:
         model = User
