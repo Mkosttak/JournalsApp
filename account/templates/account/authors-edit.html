@@ -25,9 +25,9 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <!-- Profil Fotoğrafı -->
-                    <div class="d-flex justify-content-center mb-4">
-                        <div class="profile-image-upload">
+                    <!-- Profil Fotoğrafı ve CV Görüntüle Butonu -->
+                    <div class="d-flex flex-column align-items-center mb-4">
+                        <div class="profile-image-upload mb-3">
                             {% if author.profile_image %}
                                 <img src="{{ author.profile_image.url }}" alt="Profil Fotoğrafı" class="profile-image">
                             {% else %}
@@ -42,7 +42,7 @@
                             </div>
                         </div>
                         {% if author.resume %}
-                            <div class="flex-grow-1 ms-4">
+                            <div>
                                 <a href="{{ author.resume.url }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill">
                                     <i class="bi bi-file-earmark-text me-2"></i>Güncel CV'yi Görüntüle
                                 </a>
@@ -58,14 +58,9 @@
                                     {% include 'partials/_form_field.html' with form_field=field %}
                                 {% endfor %}
 
-                                <!-- Bio Field -->
-                                {% include 'partials/_form_field.html' with form_field=author_form.bio %}
-
                             </div>
                             <div class="col-md-6">
                                 <!-- Resume and Is Approved Fields -->
-                                {% include 'partials/_form_field.html' with form_field=author_form.resume %}
-
                                 <div class="mb-4 form-group">
                                     <label for="{{ author_form.is_approved.id_for_label }}" class="form-label fw-medium">Bu kullanıcı editör olsun mu?</label>
                                     <div class="form-check form-switch">
