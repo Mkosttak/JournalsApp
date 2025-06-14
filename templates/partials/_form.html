@@ -10,7 +10,7 @@
 {% endfor %}
 
 {% for field in form %}
-    {% if field.name != 'profile_image' and field.name != 'resume' and field.name != 'is_approved' and field.name != 'bio' %}
+    {% if field.name != 'profile_image' and field.name != 'resume' and field.name != 'is_approved' and field.name != 'bio' and field.name != 'file' %}
         {% include 'partials/_form_field.html' with form_field=field %}
     {% endif %}
 {% endfor %}

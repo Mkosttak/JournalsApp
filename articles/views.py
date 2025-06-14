@@ -140,6 +140,10 @@ def article_edit(request, id):
     if request.method == 'POST':
         form = form_class(request.POST, request.FILES, instance=article)
         if form.is_valid():
+            print("Form geçerli!")
+            print("Formun cleaned_data:", form.cleaned_data)
+            print("Request.FILES:", request.FILES)
+
             original_admin_note = article.admin_note # Notun orijinal halini al
 
             updated_article = form.save(commit=False)

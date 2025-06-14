@@ -1,0 +1,3 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Diğer scriptler buraya gelecekse...
+});
