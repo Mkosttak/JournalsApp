@@ -1,17 +1,59 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
 
-{% block page_title %}
-    Hakkımızda
+{% block title %}
+    Hakkımızda - Hacettepe Matematik
 {% endblock %}
 
-
 {% block content %}
-    <div class="container mt-3">
-        <div class="row">
-            <div class="col-12">
-                <h1>Hakkımızda</h1>
-            </div>
+
+<section class="py-5" style="background-color: #f8f9fa;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+
+        <div class="bg-white border border-2 rounded-4 shadow-sm p-5">
+
+          <div class="text-center mb-5">
+            <h1 class="fw-bold">Hakkımızda</h1>
+            <p class="text-muted fs-5">
+              Akademik üretimin dijital platformlarla daha erişilebilir hale gelmesi için buradayız.
+            </p>
+          </div>
+
+          <p class="fs-5">
+            Bu platform, <strong>Hacettepe Üniversitesi Matematik Bölümü</strong> öğretim üyeleri ve araştırmacıları tarafından
+            geliştirilen bir <strong>makale yayın ve paylaşım sistemidir</strong>. Amaç; matematik, istatistik, uygulamalı bilimler ve
+            ilgili alanlardaki çalışmaları çevrim içi bir ortamda yayımlamak, böylece bilimsel iletişimi hızlandırmak ve güçlendirmektir.
+          </p>
+
+          <hr class="my-4">
+
+          <h3 class="h5 fw-semibold mb-3">Neler Sunuyoruz?</h3>
+          <ul class="list-unstyled fs-5 mb-4">
+            <li class="mb-2">✅ Makale gönderme, düzenleme ve takip sistemi</li>
+            <li class="mb-2">✅ Kategoriye ve konuya göre sınıflandırılmış içerik</li>
+            <li class="mb-2">✅ Editör ve hakem onay süreçleri</li>
+            <li class="mb-2">✅ Arama ve filtreleme özellikleriyle zenginleştirilmiş erişim</li>
+            <li class="mb-2">✅ Akademik profil oluşturma imkanı</li>
+          </ul>
+
+          <h3 class="h5 fw-semibold mb-3">Kimler İçin Tasarlandı?</h3>
+          <p class="fs-5 mb-4">
+            Bu sistem, özellikle <strong>üniversite öğretim üyeleri</strong>, <strong>lisansüstü öğrenciler</strong> ve <strong>bağımsız araştırmacılar</strong>
+            için oluşturulmuştur. Bilimsel yayın sürecinin daha kolay ve etkili yönetilebilmesi hedeflenmiştir.
+          </p>
+
+          <h3 class="h5 fw-semibold mb-3">Birlikte Bilimin İzinde</h3>
+          <p class="fs-5">
+            Sitemiz, disiplinler arası etkileşimi destekleyen, akademik şeffaflığı ve erişilebilirliği önceleyen bir vizyonla geliştirilmektedir.
+            Gönüllü katkılarla büyüyen bu sistemin parçası olduğunuz için teşekkür ederiz.
+          </p>
 
         </div>
+
+      </div>
     </div>
+  </div>
+</section>
+
 {% endblock %}

@@ -38,7 +38,7 @@
                                     <div class="flex-grow-1">
                                         {% if form.instance.file %}
                                             <a href="{{ form.instance.file.url }}" target="_blank" class="text-decoration-none" id="current-pdf-link">
-                                                <span class="fw-bold d-block text-truncate" id="current-pdf-name" data-original-name="Şu anki: {{ form.instance.file.name }}" style="max-width: 90%; cursor: pointer;">Şu anki: {{ form.instance.file.name|truncatechars:30 }}</span>
+                                                <span class="fw-bold d-block text-truncate" id="current-pdf-name" data-original-name="Mevcut: {{ form.instance.file.name }}" style="max-width: 90%; cursor: pointer;">Mevcut Dosya: {{ form.instance.file.name|truncatechars:30 }}</span>
                                             </a>
                                         {% else %}
                                             <span class="fw-bold d-block text-truncate" id="current-pdf-name" data-original-name="PDF silindi" style="max-width: 90%;">Mevcut PDF Yok</span>

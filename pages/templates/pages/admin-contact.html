@@ -215,10 +215,6 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Sil</button>
             </div>
-        }
-    }
-}
-
 {% endblock %}
 
 {% block js_files %}
@@ -256,14 +252,15 @@ document.addEventListener('DOMContentLoaded', function() {
         toast.setAttribute('aria-atomic', 'true');
 
         toast.innerHTML = `
-            <div class="d-flex">
+            <div class="d-flex w-100 justify-content-between align-items-center">
                 <div class="toast-body">
                     <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'} me-2"></i>
                     ${message}
-                }
+                </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            }
-        `;
+            </div>
+`;
+
 
         document.querySelector('.toast-container').appendChild(toast);
         const bsToast = new bootstrap.Toast(toast, {

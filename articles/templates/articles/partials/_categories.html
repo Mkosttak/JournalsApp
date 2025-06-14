@@ -1,8 +1,11 @@
-<div class="list-group">
-    <a href="/makale" class="list-group-item list-group-item-action">Tüm Kategoriler</a>
+<div class="list-group border rounded-4 overflow-hidden shadow-sm">
+    <a href="/makale"
+       class="list-group-item list-group-item-action py-3 px-4 fs-6 {% if not seciliKategori %}active bg-primary text-white fw-semibold{% else %}bg-light{% endif %}">
+        Tüm Makaleler
+    </a>
     {% for category in categories %}
         <a href="{% url 'articles:articles_by_category' category.slug %}"
-           class="list-group-item list-group-item-action {% if seciliKategori == category.slug %}active{% endif %}">
+           class="list-group-item list-group-item-action py-3 px-4 fs-6 {% if seciliKategori == category.slug %}active bg-primary text-white fw-semibold{% else %}bg-white text-dark{% endif %}">
             {{ category.name|title }}
         </a>
     {% endfor %}
