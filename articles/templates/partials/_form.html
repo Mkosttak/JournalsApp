@@ -1,0 +1,5 @@
+{% for field in form %}
+    {% if field.name != 'admin_note' %}
+        {% include 'partials/_form_field.html' with field=field %}
+    {% endif %}
+{% endfor %} 

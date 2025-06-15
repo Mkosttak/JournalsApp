@@ -88,11 +88,11 @@
                                         {% endif %}
                                     </td>
                                     <td class="text-center">
-                                        <a href="{% url 'account:authors_edit' author.id %}" class="btn btn-sm btn-info me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
-                                            <i class="bi bi-pencil"></i>
+                                        <a href="{% url 'account:author_detail' author.id %}" class="btn btn-sm btn-success me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Profili Görüntüle">
+                                            <i class="bi bi-person-circle"></i>
                                         </a>
-                                        <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Sil" onclick="confirmDelete('{{ author.id }}', '{{ author.user.username }}')">
-                                            <i class="bi bi-trash"></i>
+                                        <a href="{% url 'account:authors_edit' author.id %}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
+                                            <i class="bi bi-pencil"></i>
                                         </a>
                                     </td>
                                 </tr>
