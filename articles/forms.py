@@ -4,14 +4,29 @@ import os
 
 
 class ArticleCreateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Sadece editör ve superuser için kategori alanını dinamik olarak ekle
+        if user and (user.is_staff or user.is_superuser):
+            self.fields['categories'] = forms.ModelChoiceField(
+                queryset=Category.objects.all(), 
+                empty_label="Kategori Seçiniz", 
+                required=True, 
+                error_messages={'required': "Lütfen bir kategori seçin."}
+            )
+        self.fields['file'].required = True # PDF alanı zorunlu yapıldı
+
     class Meta:
         model = Article
-        fields = ['title', 'description', 'file', 'keywords']
+        fields = ['title', 'description', 'file', 'keywords'] # categories buradan kaldırıldı
         labels = {
             'title': 'Başlık',
             'description': 'Açıklama',
             'file': 'PDF Dosyası',
             'keywords': 'Anahtar Kelimeler',
+            # 'categories': 'Kategori', # categories label'ı da buradan kaldırıldı
         }
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -35,8 +50,8 @@ class ArticleEditForm(forms.ModelForm):
     class Meta:
         model = Article
         fields = [
-            'title', 'description', 'file', 
-            'keywords', 'admin_note', 'isHome'
+            'title', 'description', 'file',
+            'keywords', 'admin_note', 'isHome', 'categories'
         ]
         labels = {
             'title': 'Başlık',
@@ -45,6 +60,7 @@ class ArticleEditForm(forms.ModelForm):
             'keywords': 'Anahtar Kelimeler',
             'admin_note': 'Editör Notu',
             'isHome': 'Ana Sayfada Göster',
+            'categories': 'Kategori',
         }
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -69,16 +85,17 @@ class ArticleEditForm(forms.ModelForm):
         return category
 
 class UserArticleEditForm(forms.ModelForm):
-    categories = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label="Kategori Seçiniz", required=True, error_messages={'required': "Sadece bir tane Kategori seçin."})
+    categories = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label="Kategori Seçiniz", required=False)
 
     class Meta:
         model = Article
-        fields = ['title', 'description', 'file', 'keywords']
+        fields = ['title', 'description', 'file', 'keywords', 'categories']
         labels = {
             'title': 'Başlık',
             'description': 'Açıklama',
             'file': 'PDF Dosyası',
             'keywords': 'Anahtar Kelimeler',
+            'categories': 'Kategori',
         }
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -91,10 +108,11 @@ class UserArticleEditForm(forms.ModelForm):
         }
     
     def clean_categories(self):
-        category = self.cleaned_data.get('categories')
-        if not category:
-            raise forms.ValidationError("Sadece bir tane Kategori seçin.")
-        return category
+        # Bu form normal kullanıcılar için de kullanılabileceğinden, eğer kategori alanı gizliyse
+        # ve boş geliyorsa validasyon hatası vermemelidir.
+        # Eğer alan required=False ise bu metot gerekli değildir, Django otomatik halleder.
+        # ForeignKey alanları için Django, null=True ise otomatik olarak boş değeri kabul eder.
+        return self.cleaned_data.get('categories')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

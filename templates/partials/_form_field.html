@@ -12,18 +12,32 @@
     {% endif %}
 
     {% if form_field.name == 'categories' %}
-    <label for="{{ form_field.id_for_label }}" class="form-label fw-medium">
-        Kategori
-        {% if form_field.field.required %}
-        <span class="text-danger">*</span>
+        {% if user.is_staff or user.is_superuser %}
+        <label for="{{ form_field.id_for_label }}" class="form-label fw-medium">
+            Kategori
+            {% if form_field.field.required %}
+            <span class="text-danger">*</span>
+            {% endif %}
+        </label>
+        <div class="input-group">
+            {{ form_field|add_class:"form-select" }}
+            {% if user.is_superuser %}
+            <button type="button" class="btn btn-primary" id="showAddCategoryModalBtn">Yeni Kategori Ekle</button>
+            {% endif %}
+        </div>
+        {% elif user.is_authenticated and user.author and user.author.editor_article %}
+        <label for="{{ form_field.id_for_label }}" class="form-label fw-medium">
+            Kategori
+            {% if form_field.field.required %}
+            <span class="text-danger">*</span>
+            {% endif %}
+        </label>
+        <div class="input-group">
+            {{ form_field|add_class:"form-select" }}
+        </div>
+        {% else %}
+        <input type="hidden" name="{{ form_field.name }}" value="{{ form_field.value|default:'' }}">
         {% endif %}
-    </label>
-    <div class="input-group">
-        {{ form_field|add_class:"form-select" }}
-        {% if user.is_superuser %}
-        <button type="button" class="btn btn-primary" id="showAddCategoryModalBtn">Yeni Kategori Ekle</button>
-        {% endif %}
-    </div>
     {% elif form_field.name == 'file' %}
     <label for="{{ form_field.id_for_label }}" class="form-label fw-medium">PDF Dosyası</label>
     <div class="custom-file-upload-wrapper">

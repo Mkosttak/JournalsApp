@@ -36,14 +36,6 @@
                     <h4 class="mb-0"><i class="bi bi-newspaper me-2"></i>Editör Makaleleri</h4>
                 </div>
                 <div class="card-body p-4">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
 
                     {% if articles %}
                         <div class="table-responsive">
@@ -76,10 +68,8 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if article.categories.all %}
-                                                {% for category in article.categories.all %}
-                                                    <span class="badge bg-primary text-white rounded-pill">{{ category.name }}</span>{% if not forloop.last %}, {% endif %}
-                                                {% endfor %}
+                                            {% if article.categories %}
+                                                <span class="badge bg-primary text-white rounded-pill">{{ article.categories.name }}</span>
                                             {% else %}
                                                 <span class="badge bg-danger text-white rounded-pill">Yok</span>
                                             {% endif %}

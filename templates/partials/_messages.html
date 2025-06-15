@@ -4,18 +4,29 @@
     {# " - " içeren mesajları atla, çünkü bunlar Contact modelinin __str__ çıktısı gibi görünüyor #}
     {% if " - " not in message|stringformat:"s" %}
     <div class="alert-wrapper animate__animated animate__fadeInDown">
-        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert">
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm border-0 rounded-4" role="alert">
             <div class="d-flex align-items-center justify-content-between w-100">
                 <div class="d-flex align-items-center flex-grow-1">
                     {% if message.tags == 'success' %}
+                    <div class="alert-icon-wrapper bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                    </div>
                     {% elif message.tags == 'error' or message.tags == 'danger' %}
-                    <i class="bi bi-exclamation-triangle-fill me-2 text-danger fs-5"></i>
+                    <div class="alert-icon-wrapper bg-danger bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                    </div>
                     {% elif message.tags == 'warning' %}
-                    <i class="bi bi-exclamation-circle-fill me-2 text-warning fs-5"></i>
+                    <div class="alert-icon-wrapper bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="bi bi-exclamation-circle-fill text-warning fs-5"></i>
+                    </div>
                     {% elif message.tags == 'info' %}
-                    <i class="bi bi-info-circle-fill me-2 text-info fs-5"></i>
+                    <div class="alert-icon-wrapper bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="bi bi-info-circle-fill text-info fs-5"></i>
+                    </div>
                     {% else %}
-                    <i class="bi bi-bell-fill me-2 text-secondary fs-5"></i>
+                    <div class="alert-icon-wrapper bg-secondary bg-opacity-10 rounded-circle p-2 me-3">
+                        <i class="bi bi-bell-fill text-secondary fs-5"></i>
+                    </div>
                     {% endif %}
 
                     <div class="message-content">{{ message }}</div>
@@ -44,22 +55,45 @@
 .alert-wrapper {
     max-width: 90%;
     width: 420px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     pointer-events: none;
 }
 
 .alert {
     font-size: 0.95rem;
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     margin-bottom: 0;
     display: block;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-    border-radius: 0.5rem !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+    border-radius: 1rem !important;
     font-weight: 500;
     pointer-events: none;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
+    transition: all 0.3s ease;
+}
+
+.alert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.alert-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    transition: all 0.3s ease;
+}
+
+.alert:hover .alert-icon-wrapper {
+    transform: scale(1.1);
 }
 
 .btn-close {
@@ -70,37 +104,43 @@
     height: 1rem;
     pointer-events: auto;
     opacity: 0.75;
-    transition: opacity 0.2s;
+    transition: all 0.2s ease;
 }
 
 .btn-close:hover {
     opacity: 1;
+    transform: scale(1.1);
 }
 
 .alert-success { 
-    background-color: rgba(178, 223, 188, 0.85) !important; 
-    color: #155724 !important; 
+    background: rgba(255, 255, 255, 0.7) !important; 
+    color: #198754 !important; 
+    border: 1px solid rgba(25, 135, 84, 0.2) !important;
 }
 
 .alert-danger,
 .alert-error { 
-    background-color: rgba(241, 176, 183, 0.85) !important; 
-    color: #721c24 !important; 
+    background: rgba(255, 255, 255, 0.7) !important; 
+    color: #dc3545 !important; 
+    border: 1px solid rgba(220, 53, 69, 0.2) !important;
 }
 
 .alert-warning { 
-    background-color: rgba(255, 229, 158, 0.85) !important; 
-    color: #856404 !important; 
+    background: rgba(255, 255, 255, 0.7) !important; 
+    color: #ffc107 !important; 
+    border: 1px solid rgba(255, 193, 7, 0.2) !important;
 }
 
 .alert-info { 
-    background-color: rgba(165, 216, 232, 0.85) !important; 
-    color: #0c5460 !important; 
+    background: rgba(255, 255, 255, 0.7) !important; 
+    color: #0dcaf0 !important; 
+    border: 1px solid rgba(13, 202, 240, 0.2) !important;
 }
 
 .message-content { 
     flex: 1;
-    line-height: 1.4;
+    line-height: 1.5;
+    font-size: 0.95rem;
 }
 
 @media (max-width: 576px) {
@@ -112,7 +152,11 @@
     }
     .alert { 
         font-size: 0.9rem; 
-        padding: 0.7rem 0.9rem; 
+        padding: 0.875rem 1rem; 
+    }
+    .alert-icon-wrapper {
+        width: 36px;
+        height: 36px;
     }
 }
 

@@ -69,25 +69,25 @@ def isAdmin(user):
 @login_required()
 def article_create(request):
     if request.method == "POST":
-        form = ArticleCreateForm(request.POST, request.FILES)
+        form = ArticleCreateForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             article = form.save(commit=False)
             article.author = request.user
             article.save()
-            form.save_m2m()
+            # form.save_m2m() # ManyToMany ilişkiler için kullanılır, ForeignKey için gerekli değildir.
             messages.success(request, "Makale başarıyla oluşturuldu ve yayınlanmak üzere incelenmeyi bekliyor.")
             return redirect('account:my_articles')
         else:
             return render(request, 'articles/article-create.html', {"form": form})
     else:
-        form = ArticleCreateForm()
+        form = ArticleCreateForm(user=request.user)
     return render(request, 'articles/article-create.html', {"form": form})
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def article_list(request):
     query = request.GET.get("q", "").strip()
-    articles = Article.objects.all().select_related('author').order_by('isHome', '-created_at')
+    articles = Article.objects.all().select_related('author', 'categories').order_by('isHome', '-created_at')
 
     if query:
         articles = articles.filter(
@@ -165,7 +165,7 @@ def article_edit(request, id):
 
             # Tüm değişiklikleri veritabanına kaydet (dosya dahil)
             updated_article.save()
-            form.save_m2m()
+            # form.save_m2m() # ManyToMany ilişkiler için kullanılır, ForeignKey için gerekli değildir.
 
             messages.success(request, "Makale başarıyla güncellendi.")
 

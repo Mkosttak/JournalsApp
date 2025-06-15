@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
         pdfInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const fileName = this.files[0].name;
-                currentPdfName.textContent = fileName;
-                currentPdfName.setAttribute('data-original-name', fileName);
+                currentPdfName.textContent = 'Seçilen: ' + fileName;
+                currentPdfName.setAttribute('data-original-name', 'Seçilen: ' + fileName);
                 
                 // Update button text
                 if (changePdfBtnText) {
@@ -26,12 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (currentPdfLink) {
                     const parent = currentPdfLink.parentNode;
                     parent.replaceChild(currentPdfName, currentPdfLink);
-                }
-
-                // Dosya seçildiğinde form otomatik olarak gönderilsin
-                const form = pdfInput.closest('form');
-                if (form) {
-                    form.submit();
                 }
             }
         });
