@@ -136,11 +136,17 @@ def profile_edit(request):
 
 @login_required
 def my_articles(request):
-    articles = Article.objects.filter(author__user=request.user).order_by('-created_at')
+    articles = Article.objects.filter(author=request.user).order_by('-created_at')
+    total_articles = articles.count()
+    approved_articles = articles.filter(isHome=True).count()
+    pending_articles = articles.filter(isHome=False).count()
     context = {
-        'articles': articles
+        'articles': articles,
+        'total_articles': total_articles,
+        'approved_articles': approved_articles,
+        'pending_articles': pending_articles,
     }
-    return render(request, 'account/my_articles.html', context)
+    return render(request, 'account/my-articles.html', context)
 
 def authors_list(request):
     query = request.GET.get("q", "").strip()
