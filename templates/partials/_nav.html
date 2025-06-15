@@ -138,14 +138,21 @@
              role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <div class="d-flex align-items-center">
               {% if user.author.profile_image %}
-                <img src="{{ user.author.profile_image.url }}" class="rounded-circle me-2" width="32" height="32" alt="{{ user.username }}" style="object-fit: cover;">
+                <img src="{{ user.author.profile_image.url }}" class="rounded-circle me-2" width="32" height="32" alt="{{ user.get_full_name|default:user.email }}" style="object-fit: cover;">
               {% else %}
                 <div class="rounded-circle bg-primary bg-opacity-10 d-flex justify-content-center align-items-center me-2" 
                      style="width: 32px; height: 32px;">
                   <i class="bi bi-person text-primary"></i>
                 </div>
               {% endif %}
-              <span>{{ user.username }}<i class="bi bi-caret-down-fill ms-1"></i></span>
+              <span>
+                {% if user.is_superuser %}
+                  ADMİN
+                {% else %}
+                  {{ user.get_full_name|default:user.email }}
+                {% endif %}
+                <i class="bi bi-caret-down-fill ms-1"></i>
+              </span>
             </div>
           </a>
           <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">

@@ -4,45 +4,79 @@ from django.forms import widgets, ModelForm, FileInput, TextInput, Textarea, Ema
 from django.contrib import messages
 from .models import Author
 from django import forms
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
 
 
-class LoginUserForm(AuthenticationForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["username"].widget = widgets.TextInput(attrs={"class": "form-control"})
-        self.fields["password"].widget = widgets.PasswordInput(attrs={"class": "form-control"})
+class LoginUserForm(forms.Form):
+    username = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email adresiniz"})
+    )
+    password = forms.CharField(
+        label='Şifre',
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Şifreniz"})
+    )
 
-    def clean_username(self):
-        username = self.cleaned_data.get("username")
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('username')
+        password = cleaned_data.get('password')
 
-        if username == "admin":
-            messages.add_message(self.request, messages.SUCCESS, "Admin Hoşgeldin!")
-        return username
+        if email and password:
+            try:
+                user = User.objects.get(email=email)
+                if not user.check_password(password):
+                    raise forms.ValidationError("Email veya şifre hatalı!")
+                cleaned_data['user'] = user
+            except User.DoesNotExist:
+                raise forms.ValidationError("Bu email adresi ile kayıtlı bir kullanıcı bulunamadı.")
+        return cleaned_data
 
 
-class NewUserForm(UserCreationForm):
+class RegisterUserForm(UserCreationForm):
+    email = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email adresiniz"})
+    )
+    first_name = forms.CharField(
+        label='Ad',
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Adınız"})
+    )
+    last_name = forms.CharField(
+        label='Soyad',
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Soyadınız"})
+    )
+    password1 = forms.CharField(
+        label='Şifre',
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Şifreniz"}),
+        help_text='''<ul>
+            <li>En az 8 karakter uzunluğunda olmalı.</li>
+        </ul>'''
+    )
+    password2 = forms.CharField(
+        label='Şifre Tekrar',
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Şifrenizi tekrar girin"}),
+        help_text='Lütfen şifrenizi tekrar girin.'
+    )
+
     class Meta:
         model = User
-        fields = ("username", "email", "first_name", "last_name")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["password1"].widget = widgets.PasswordInput(attrs={"class": "form-control"})
-        self.fields["password2"].widget = widgets.PasswordInput(attrs={"class": "form-control"})
-        self.fields["first_name"].widget = widgets.TextInput(attrs={"class": "form-control"})
-        self.fields["last_name"].widget = widgets.TextInput(attrs={"class": "form-control"})
-        self.fields["username"].widget = widgets.TextInput(attrs={"class": "form-control"})
-        self.fields["email"].widget = widgets.EmailInput(attrs={"class": "form-control"})
-        self.fields["email"].required = True
-        self.fields["first_name"].required = True
-        self.fields["last_name"].required = True
+        fields = ['email', 'first_name', 'last_name', 'password1', 'password2']
 
     def clean_email(self):
-        email = self.cleaned_data.get("email")
+        email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
-            self.add_error("email", "Bu email adresi zaten kayıtlı.")
-
+            raise forms.ValidationError("Bu email adresi zaten kullanılıyor!")
         return email
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.username = self.cleaned_data['email']  # Email'i username olarak kullan
+        if commit:
+            user.save()
+        return user
 
 
 class UserPasswordChangeForm(PasswordChangeForm):

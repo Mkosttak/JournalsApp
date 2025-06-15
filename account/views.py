@@ -3,50 +3,42 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q, Count
-from account.forms import LoginUserForm, NewUserForm, UserPasswordChangeForm, AuthorProfileForm, UserProfileForm, UserUpdateForm
+from account.forms import LoginUserForm, RegisterUserForm, UserPasswordChangeForm, AuthorProfileForm, UserProfileForm, UserUpdateForm
 from articles.models import Article
 from account.models import Author
 from django.http import Http404
 from django.views.decorators.http import require_POST
+from django.contrib.auth.models import User
 
 
 def user_login(request):
     if request.user.is_authenticated and "next" in request.GET:
         return render(request, 'account/login.html', {"error": "Yetkiniz Yok!"})
     if request.method == "POST":
-        form = LoginUserForm(request, data=request.POST)
+        form = LoginUserForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                nextUrl = request.GET.get('next', None)
-                return redirect(nextUrl if nextUrl else 'pages:index')
-            else:
-                return render(request, 'account/login.html', {"form": form})
+            user = form.cleaned_data['user']
+            login(request, user)
+            nextUrl = request.GET.get('next', None)
+            return redirect(nextUrl if nextUrl else 'pages:index')
         else:
             return render(request, 'account/login.html', {"form": form})
     else:
         form = LoginUserForm()
         return render(request, 'account/login.html', {"form": form})
 
-def user_register(request):
+def register(request):
     if request.method == "POST":
-        form = NewUserForm(request.POST)
+        form = RegisterUserForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Author.objects.create(user=user)
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
             login(request, user)
-            messages.add_message(request, messages.SUCCESS, 'Başarılı bir şekilde kayıt oldunuz! Profilinizi düzenleyebilirsiniz.')
-            return redirect('account:profile')
+            messages.success(request, "Kayıt başarılı! Hoş geldiniz.")
+            return redirect('pages:index')
         else:
             return render(request, 'account/register.html', {"form": form})
     else:
-        form = NewUserForm()
+        form = RegisterUserForm()
         return render(request, 'account/register.html', {"form": form})
 
 @login_required
@@ -58,8 +50,6 @@ def change_password(request):
             update_session_auth_hash(request, user)
             messages.success(request, 'Parolanız Güncellendi!')
             return redirect('account:change_password')
-        else:
-            messages.error(request, 'Tekrar Deneyiniz!')
     else:
         form = UserPasswordChangeForm(request.user)
     return render(request, 'account/change-password.html', {"form": form})
@@ -146,36 +136,11 @@ def profile_edit(request):
 
 @login_required
 def my_articles(request):
-    query = request.GET.get("q", "").strip()
-    articles = Article.objects.filter(author=request.user)
-
-    if query:
-        articles = articles.filter(
-            Q(title__icontains=query) |
-            Q(author__first_name__icontains=query) |
-            Q(author__last_name__icontains=query) |
-            Q(keywords__icontains=query)
-        ).distinct()
-
-    # Her makale için anahtar kelimeleri listeye dönüştür
-    for article in articles:
-        if article.keywords:
-            article.keyword_list = [k.strip() for k in article.keywords.split(',') if k.strip()]
-        else:
-            article.keyword_list = []
-
-    total_articles = articles.count()
-    approved_articles = articles.filter(isHome=True).count()
-    pending_articles = articles.filter(isHome=False).count()
-    
+    articles = Article.objects.filter(author__user=request.user).order_by('-created_at')
     context = {
-        'articles': articles,
-        'total_articles': total_articles,
-        'approved_articles': approved_articles,
-        'pending_articles': pending_articles,
-        'query': query
+        'articles': articles
     }
-    return render(request, 'account/my-articles.html', context)
+    return render(request, 'account/my_articles.html', context)
 
 def authors_list(request):
     query = request.GET.get("q", "").strip()
@@ -278,12 +243,10 @@ def authors_edit(request, author_id):
 
 @login_required
 def editor_articles(request):
-    # Superuser veya editör yetkisi olanlar erişebilir
-    if not (request.user.is_superuser or (hasattr(request.user, 'author') and request.user.author.editor_article)):
-        messages.error(request, "Bu sayfaya erişim yetkiniz bulunmamaktadır.")
-        return redirect('index') # 'home' yerine 'index'e yönlendirme yapıyorum.
-    
-    articles = Article.objects.all().order_by('isHome', '-created_at')
-    return render(request, 'account/editor-articles.html', {
+    # Editörlerin görmesi gereken makaleler için örnek bir filtreleme
+    # Örneğin, henüz onaylanmamış makaleleri gösterebiliriz.
+    articles = Article.objects.filter(isHome=False).order_by('-created_at')
+    context = {
         'articles': articles
-    })
+    }
+    return render(request, 'account/editor_articles.html', context)

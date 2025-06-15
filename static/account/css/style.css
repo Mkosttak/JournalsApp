@@ -318,3 +318,32 @@ textarea.form-control {
     color: #6c757d;
     opacity: 1;
 }
+
+/* Dropdown Menü Buzlu Cam Efekti */
+.dropdown-menu {
+  background-color: #ffffff !important; /* Tamamen opak beyaz */
+  backdrop-filter: blur(15px) !important; /* Bulanıklık efekti (isteğe bağlı olarak kalabilir) */
+  border: 1px solid rgba(0, 0, 0, 0.1) !important; /* Hafif kenarlık */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; /* Daha belirgin gölge */
+  border-radius: 0.5rem !important;
+}
+
+.dropdown-menu .dropdown-item {
+  color: #212529 !important; /* Metin rengi */
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+  background-color: rgba(0, 0, 0, 0.05) !important; /* Hover arka planı */
+  color: #212529 !important;
+}
+
+.dropdown-menu .dropdown-divider {
+  border-top-color: rgba(0, 0, 0, 0.1) !important; /* Bölücü çizgisi */
+}
+
+.dropdown-menu .dropdown-item.text-danger:hover,
+.dropdown-menu .dropdown-item.text-danger:focus {
+  background-color: #dc3545 !important; /* Kırmızı arka plan */
+  color: #fff !important; /* Beyaz metin */
+}
