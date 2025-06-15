@@ -71,7 +71,10 @@ class AuthorProfileForm(ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-
+        # Kullanıcı admin değilse bu alanları formdan çıkar
+        if user and not user.is_superuser:
+            self.fields.pop('is_approved', None)
+            self.fields.pop('editor_article', None)
         # Add a custom attribute to store the original resume file name for JavaScript
         if self.instance and self.instance.resume and self.instance.resume.name:
             self.fields['resume'].widget.attrs['data-original-name'] = self.get_resume_file_display_name()
