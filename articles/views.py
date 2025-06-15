@@ -78,11 +78,7 @@ def article_create(request):
             messages.success(request, "Makale başarıyla oluşturuldu ve yayınlanmak üzere incelenmeyi bekliyor.")
             return redirect('account:my_articles')
         else:
-            return render(request, 'articles/article-create.html', {
-                "form": form,
-                "error": True,
-                "msg": "Lütfen yalnızca PDF formatında dosya yükleyin."
-            })
+            return render(request, 'articles/article-create.html', {"form": form})
     else:
         form = ArticleCreateForm()
     return render(request, 'articles/article-create.html', {"form": form})

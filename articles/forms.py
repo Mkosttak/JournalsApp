@@ -23,6 +23,12 @@ class ArticleCreateForm(forms.ModelForm):
             }),
         }
 
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if not file:
+            raise forms.ValidationError("Lütfen bir PDF dosyası yükleyin.")
+        return file
+
 class ArticleEditForm(forms.ModelForm):
     class Meta:
         model = Article
