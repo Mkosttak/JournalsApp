@@ -120,19 +120,6 @@
                                         <div class="text-danger small mt-1">{{ error }}</div>
                                     {% endfor %}
                                 </div>
-
-                                {% if user.is_superuser %}
-                                    <div class="mb-4 form-group">
-                                        <label for="{{ author_form.is_approved.id_for_label }}" class="form-label fw-medium">Editör sayfasında görünlensin mi?</label>
-                                        <div class="form-check form-switch">
-                                            {{ author_form.is_approved }}
-                                            <label class="form-check-label" for="{{ author_form.is_approved.id_for_label }}">
-                                                {% if author.is_approved %}Evet, Görünsün{% else %}Hayır, Görünmesin{% endif %}
-                                            </label>
-                                            <div class="form-text text-muted small mt-1">{{ author_form.is_approved.help_text|safe }}</div>
-                                        </div>
-                                    </div>
-                                {% endif %}
                             </div>
                         </div>
                         <div class="d-flex gap-3 mt-4 justify-content-center">

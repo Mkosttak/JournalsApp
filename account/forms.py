@@ -59,19 +59,18 @@ class AuthorProfileForm(ModelForm):
 
     class Meta:
         model = Author
-        fields = ('profile_image', 'bio', 'resume', 'is_approved')
+        fields = ('profile_image', 'bio', 'resume', 'is_approved', 'editor_article')
         widgets = {
             'profile_image': FileInput(attrs={"class": "form-control"}),
             'bio': Textarea(attrs={"class": "form-control", "rows": 5}),
             'resume': FileInput(attrs={"class": "form-control"}),
             'is_approved': forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            'editor_article': forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        if user and not user.is_superuser:
-            self.fields.pop('is_approved', None)
 
         # Add a custom attribute to store the original resume file name for JavaScript
         if self.instance and self.instance.resume and self.instance.resume.name:

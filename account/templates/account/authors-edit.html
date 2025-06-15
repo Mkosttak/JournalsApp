@@ -62,13 +62,24 @@
                             <div class="col-md-6">
                                 <!-- Resume and Is Approved Fields -->
                                 <div class="mb-4 form-group">
-                                    <label for="{{ author_form.is_approved.id_for_label }}" class="form-label fw-medium">Bu kullanıcı editör olsun mu?</label>
+                                    <label for="{{ author_form.is_approved.id_for_label }}" class="form-label fw-medium">Bu kullanıcı editör sayfasında görüntülensin mi?</label>
                                     <div class="form-check form-switch">
                                         {{ author_form.is_approved }}
-                                        <label class="form-check-label" for="{{ author_form.is_approved.id_for_label }}">
+                                        <label class="form-check-label" id="is-approved-label" for="{{ author_form.is_approved.id_for_label }}">
                                             {% if author.is_approved %}Evet{% else %}Hayır{% endif %}
                                         </label>
                                         <div class="form-text text-muted small mt-1">{{ author_form.is_approved.help_text|safe }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4 form-group">
+                                    <label for="{{ author_form.editor_article.id_for_label }}" class="form-label fw-medium">Bu kullanıcı EDİTÖR yetkisine verilsin mi?</label>
+                                    <div class="form-check form-switch">
+                                        {{ author_form.editor_article }}
+                                        <label class="form-check-label" id="editor-article-label" for="{{ author_form.editor_article.id_for_label }}">
+                                            {% if author.editor_article %}Evet{% else %}Hayır{% endif %}
+                                        </label>
+                                        <div class="form-text text-muted small mt-1">{{ author_form.editor_article.help_text|safe }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -203,4 +214,27 @@
     }
 }
 </style>
+
+{% block js_files %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // is_approved
+    var isApprovedInput = document.getElementById('{{ author_form.is_approved.id_for_label }}');
+    var isApprovedLabel = document.getElementById('is-approved-label');
+    if (isApprovedInput && isApprovedLabel) {
+        isApprovedInput.addEventListener('change', function() {
+            isApprovedLabel.textContent = isApprovedInput.checked ? 'Evet' : 'Hayır';
+        });
+    }
+    // editor_article
+    var editorArticleInput = document.getElementById('{{ author_form.editor_article.id_for_label }}');
+    var editorArticleLabel = document.getElementById('editor-article-label');
+    if (editorArticleInput && editorArticleLabel) {
+        editorArticleInput.addEventListener('change', function() {
+            editorArticleLabel.textContent = editorArticleInput.checked ? 'Evet' : 'Hayır';
+        });
+    }
+});
+</script>
+{% endblock %}
 {% endblock %}

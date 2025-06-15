@@ -236,7 +236,7 @@ def profile_view(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_authors(request):
-    authors = Author.objects.annotate(article_count=Count('user__article')).order_by('-editor_article', '-is_approved', 'created_at')
+    authors = Author.objects.filter(user__is_superuser=False).annotate(article_count=Count('user__article')).order_by('-editor_article', '-is_approved', 'created_at')
     return render(request, 'account/admin-authors.html', {'authors': authors})
 
 @login_required
@@ -260,8 +260,25 @@ def authors_edit(request, author_id):
     if request.method == 'POST':
         if user_form.is_valid() and author_form.is_valid():
             user_form.save()
+            # Handle resume clearing
+            if author_form.cleaned_data.get('clear_resume'):
+                author.resume = None
+            # Handle profile image clearing
+            if author_form.cleaned_data.get('clear_profile_image'):
+                author.profile_image = None
+            # Save author form data
             author_form.save()
+            messages.success(request, 'Editör bilgileri başarıyla güncellendi.')
             return redirect('account:admin_authors')
+        else:
+            if not user_form.is_valid():
+                for field, errors in user_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"Kullanıcı Bilgileri - {field}: {error}")
+            if not author_form.is_valid():
+                for field, errors in author_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"Editör Bilgileri - {field}: {error}")
     return render(request, 'account/authors-edit.html', {
         'user_form': user_form,
         'author_form': author_form,

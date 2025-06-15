@@ -48,11 +48,10 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Ad Soyad</th>
-                                    <th scope="col">Kullanıcı Adı</th>
                                     <th scope="col">Email</th>
                                     <th scope="col" class="text-center">Makale Sayısı</th>
-                                    <th scope="col" class="text-center">Onay Durumu</th>
-                                    <th scope="col" class="text-center">Editör Makaleleri</th>
+                                    <th scope="col" class="text-center">Editor sayfası</th>
+                                    <th scope="col" class="text-center">Editör Yetkisi</th>
                                     <th scope="col" class="text-center">İşlemler</th>
                                 </tr>
                             </thead>
@@ -72,7 +71,6 @@
                                             <span>{{ author.full_name|default:"-" }}</span>
                                         </div>
                                     </td>
-                                    <td>@{{ author.user.username }}</td>
                                     <td>{{ author.user.email }}</td>
                                     <td class="text-center">{{ author.article_count }}</td>
                                     <td class="text-center">
