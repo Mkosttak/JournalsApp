@@ -80,14 +80,14 @@
                     Yazar
                 </h5>
                 <div class="d-flex align-items-center">
-                    {% if article.author %}
-                        <a href="{% url 'account:author_detail' article.author.id %}" 
+                    {% if article.author and article.author.author %}
+                        <a href="{% url 'account:author_detail' article.author.author.id %}" 
                            class="badge bg-primary bg-opacity-10 text-primary text-decoration-none px-3 py-2 rounded-pill">
                             <i class="bi bi-person me-1"></i>
                             {{ article.author.get_full_name|default:article.author.username }}
                         </a>
                     {% else %}
-                        <span class="text-muted">Yazar belirtilmemiş</span>
+                        <span class="text-muted">Yazar profili yok</span>
                     {% endif %}
                 </div>
             </div>

@@ -201,11 +201,7 @@ def authors_list(request):
     })
 
 def author_detail(request, author_id):
-    try:
-        author = Author.objects.get(id=author_id, is_approved=True)
-    except Author.DoesNotExist:
-        messages.error(request, "Yazar bulunamadı veya onaylanmamış.")
-        return redirect('account:authors_list')
+    author = get_object_or_404(Author, id=author_id)
     articles = Article.objects.filter(author=author.user, isHome=True)
     return render(request, 'account/author-detail.html', {'author': author, 'articles': articles})
 
