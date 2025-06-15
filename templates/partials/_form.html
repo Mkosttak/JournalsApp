@@ -9,8 +9,58 @@
 </div>
 {% endfor %}
 
+{# Başlık #}
 {% for field in form %}
-    {% if field.name != 'profile_image' and field.name != 'resume' and field.name != 'is_approved' and field.name != 'bio' and field.name != 'file' %}
+    {% if field.name == 'title' %}
+        {% include 'partials/_form_field.html' with form_field=field %}
+    {% endif %}
+{% endfor %}
+
+{# Açıklama #}
+{% for field in form %}
+    {% if field.name == 'description' %}
+        {% include 'partials/_form_field.html' with form_field=field %}
+    {% endif %}
+{% endfor %}
+
+{# PDF Dosyası #}
+{% for field in form %}
+    {% if field.name == 'file' %}
+        {% include 'partials/_form_field.html' with form_field=field %}
+    {% endif %}
+{% endfor %}
+
+{# Anahtar Kelime #}
+{% for field in form %}
+    {% if field.name == 'keywords' %}
+        {% include 'partials/_form_field.html' with form_field=field %}
+    {% endif %}
+{% endfor %}
+
+{# Kategori #}
+{% for field in form %}
+    {% if field.name == 'categories' %}
+        {% include 'partials/_form_field.html' with form_field=field %}
+    {% endif %}
+{% endfor %}
+
+{# Editör Notu #}
+{% for field in form %}
+    {% if field.name == 'admin_note' %}
+        {% include 'partials/_form_field.html' with form_field=field %}
+    {% endif %}
+{% endfor %}
+
+{# Ana Sayfa #}
+{% for field in form %}
+    {% if field.name == 'is_home' %}
+        {% include 'partials/_form_field.html' with form_field=field %}
+    {% endif %}
+{% endfor %}
+
+{# Diğer alanlar #}
+{% for field in form %}
+    {% if field.name != 'title' and field.name != 'description' and field.name != 'file' and field.name != 'keywords' and field.name != 'categories' and field.name != 'admin_note' and field.name != 'is_home' and field.name != 'profile_image' and field.name != 'resume' and field.name != 'is_approved' and field.name != 'bio' %}
         {% include 'partials/_form_field.html' with form_field=field %}
     {% endif %}
 {% endfor %}

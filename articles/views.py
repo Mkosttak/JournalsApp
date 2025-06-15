@@ -177,9 +177,9 @@ def article_edit(request, id):
                 return redirect('account:my_articles')
         else:
             # Form geçerli değilse hataları kullanıcıya göster
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"Lütfen {field} alanını kontrol edin: {error}")
+            # for field, errors in form.errors.items():
+            #     for error in errors:
+            #         messages.error(request, f"Lütfen {field} alanını kontrol edin: {error}")
             return render(request, template, {"form": form})
     else:
         form = form_class(instance=article)

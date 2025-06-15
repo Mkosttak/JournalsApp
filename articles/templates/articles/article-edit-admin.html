@@ -25,7 +25,7 @@
                         </style>
                         {% include 'partials/_form.html' %}
 
-                        <div class="d-flex gap-2 mt-4 justify-content-end">
+                        <div class="d-flex gap-2 mt-4 justify-content-center">
                             <button class="btn btn-primary px-4 py-2 rounded-pill shadow-sm" type="submit">
                                 <i class="bi bi-save me-1"></i> Kaydet
                             </button>
@@ -130,41 +130,34 @@
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
+            if (xhr.status === 200) {
                 try {
                     var response = JSON.parse(xhr.responseText);
-                    if (response.id && response.name) {
+                    if (response.success) {
+                        // Add the new category to the select element
                         var select = document.getElementById('id_categories');
-                        var option = new Option(response.name, response.id, true, true);
+                        var option = new Option(response.category_name, response.category_id);
                         select.add(option);
-
-                        var changeEvent = new Event('change');
-                        select.dispatchEvent(changeEvent);
-
-                        console.log('Kategori başarıyla eklendi: ' + response.name);
-                        document.getElementById('newCategoryName').value = '';
+                        select.value = response.category_id;
                         
-                        console.log('Modal gizleniyor...');
-                        addCategoryModalInstance.hide(); 
-
+                        // Close the modal
+                        addCategoryModalInstance.hide();
+                        
+                        // Show success message
+                        alert('Kategori başarıyla eklendi!');
                     } else {
-                        // This case should ideally be handled by the server returning a 400 status
-                        showCategoryError('Kategori eklenirken bir hata oluştu.');
+                        showCategoryError(response.error || 'Kategori eklenirken bir hata oluştu.');
                     }
                 } catch (e) {
-                    showCategoryError('Sunucudan geçersiz yanıt: ' + e.message);
+                    showCategoryError('Sunucudan geçersiz yanıt alındı.');
                 }
             } else {
-                try {
-                    var errorResponse = JSON.parse(xhr.responseText);
-                    showCategoryError(errorResponse.error || 'Bilinmeyen bir hata oluştu.');
-                } catch (e) {
-                    showCategoryError('Sunucudan hata yanıtı ayrıştırılırken hata oluştu.');
-                }
+                showCategoryError('Sunucu hatası: ' + xhr.status);
             }
         };
+
         xhr.onerror = function() {
-            showCategoryError('İstek gönderilirken bir ağ hatası oluştu.');
+            showCategoryError('Sunucuya bağlanırken bir hata oluştu.');
         };
 
         xhr.send('name=' + encodeURIComponent(newCategoryName));

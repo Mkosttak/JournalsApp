@@ -28,7 +28,7 @@ class Article(models.Model):
     date = models.DateField(auto_now=True)
     isHome = models.BooleanField(default=False)
     slug = models.SlugField(null=False, blank=True, unique=True)
-    categories = models.ManyToManyField("Category")
+    categories = models.ForeignKey("Category",on_delete=models.SET_NULL, null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     admin_note = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

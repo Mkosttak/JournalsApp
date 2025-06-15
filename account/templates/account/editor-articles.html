@@ -55,7 +55,7 @@
                                         <th scope="col">Yazar</th>
                                         <th scope="col">Kategori</th>
                                         <th scope="col">Durum</th>
-                                        <th scope="col">Oluşturulma</th>
+                                        <th scope="col">Son Güncellenme</th>
                                         <th scope="col" class="text-center">İşlemler</th>
                                     </tr>
                                 </thead>
@@ -91,13 +91,13 @@
                                                 <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill"><i class="bi bi-hourglass-split me-1"></i>Taslak</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ article.created_at|date:"d M Y, H:i" }}</td>
+                                        <td>{{ article.updated_at|date:"d M Y, H:i" }}</td>
                                         <td class="text-center">
-                                            <a href="{% url 'articles:article_edit' article.id %}" class="btn btn-sm btn-info me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
                                             <a href="{% url 'articles:article_details' article.slug %}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Görüntüle">
                                                 <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'articles:article_edit' article.id %}" class="btn btn-sm btn-info me-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Düzenle">
+                                                <i class="bi bi-pencil"></i>
                                             </a>
                                         </td>
                                     </tr>

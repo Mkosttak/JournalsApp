@@ -10,7 +10,6 @@ class ArticleAdmin(admin.ModelAdmin):
         'title', 'description', 'file', 'categories', 'author',
         'isHome', 'admin_note', 'slug'
     )
-    filter_horizontal = ('categories',)
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):

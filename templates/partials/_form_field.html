@@ -13,15 +13,44 @@
 
     {% if form_field.name == 'categories' %}
     <label for="{{ form_field.id_for_label }}" class="form-label fw-medium">
-        {{ form_field.label }}
+        Kategori
         {% if form_field.field.required %}
         <span class="text-danger">*</span>
         {% endif %}
     </label>
     <div class="input-group">
-        {{ form_field }}
+        {{ form_field|add_class:"form-select" }}
         {% if user.is_superuser %}
         <button type="button" class="btn btn-primary" id="showAddCategoryModalBtn">Yeni Kategori Ekle</button>
+        {% endif %}
+    </div>
+    {% elif form_field.name == 'file' %}
+    <label for="{{ form_field.id_for_label }}" class="form-label fw-medium">PDF Dosyası</label>
+    <div class="custom-file-upload-wrapper">
+        <div class="d-flex align-items-center mb-2 current-file-display p-3 border rounded-pill bg-light-subtle shadow-sm" id="pdf-display-container">
+            <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-3"></i>
+            <div class="flex-grow-1">
+                {% if form_field.value %}
+                    <a href="{{ form_field.value.url }}" target="_blank" class="text-decoration-none" id="current-pdf-link">
+                        <span class="fw-bold d-block text-truncate" id="current-pdf-name" data-original-name="Mevcut: {{ form_field.value.name }}" style="max-width: 90%; cursor: pointer;">Mevcut Dosya: {{ form_field.value.name|truncatechars:30 }}</span>
+                    </a>
+                {% else %}
+                    <span class="fw-bold d-block text-truncate" id="current-pdf-name" data-original-name="PDF silindi" style="max-width: 90%;">Mevcut PDF Yok</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex gap-2" id="pdf-buttons-container">
+            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill" id="change-pdf-btn" data-bs-toggle="tooltip" data-target-id="{{ form_field.id_for_label }}" title="PDF dosyasını güncellemek için tıklayın">
+                <i class="bi bi-upload me-1"></i> <span id="change-pdf-btn-text">{% if form_field.value %}PDF Güncelle{% else %}PDF Ekle{% endif %}</span>
+            </button>
+        </div>
+        <input type="file" name="{{ form_field.name }}" id="{{ form_field.id_for_label }}" {% if form_field.field.required %} required{% endif %} class="d-none form-control" accept=".pdf">
+    </div>
+    <div class="form-text text-muted small mt-1">
+        {% if form_field.help_text %}
+            {{ form_field.help_text|safe }}
+        {% else %}
+            Sadece PDF dosyaları kabul edilmektedir.
         {% endif %}
     </div>
     {% else %}

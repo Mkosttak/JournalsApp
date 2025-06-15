@@ -1,5 +1,79 @@
 /* ArticlesApp - Articles Modülü Modern Tasarım CSS */
 
+/* Form Elemanları */
+.form-control, .form-select {
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Butonlar */
+.btn {
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-outline-primary {
+    border-width: 2px;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Kategori Seçimi ve Yeni Kategori Butonu */
+#id_categories {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}
+
+#showAddCategoryModalBtn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+    padding: 0.75rem 1rem;
+}
+
+/* PDF Yükleme Alanı */
+.custom-file-upload-wrapper {
+    position: relative;
+}
+
+.current-file-display {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.current-file-display:hover {
+    background-color: #f1f5f9;
+}
+
+#change-pdf-btn {
+    transition: all 0.3s ease;
+}
+
+#change-pdf-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
 /* Makale Kartları */
 .article-card {
   border-radius: 1rem;

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Article
+from .models import Article, Category
 import os
 
 
@@ -30,17 +30,18 @@ class ArticleCreateForm(forms.ModelForm):
         return file
 
 class ArticleEditForm(forms.ModelForm):
+    categories = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label="Kategori Seçiniz", required=True, error_messages={'required': "Sadece bir tane Kategori seçin."})
+
     class Meta:
         model = Article
         fields = [
-            'title', 'description', 'file', 'categories',
+            'title', 'description', 'file', 
             'keywords', 'admin_note', 'isHome'
         ]
         labels = {
             'title': 'Başlık',
             'description': 'Açıklama',
             'file': 'PDF Dosyası',
-            'categories': 'Kategoriler',
             'keywords': 'Anahtar Kelimeler',
             'admin_note': 'Editör Notu',
             'isHome': 'Ana Sayfada Göster',
@@ -49,7 +50,6 @@ class ArticleEditForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),
             'file': forms.FileInput(attrs={'class': 'form-control'}),
-            'categories': forms.SelectMultiple(attrs={'class': 'form-control'}),
             'keywords': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Anahtar kelimeleri virgülle ayırarak girin'
@@ -62,7 +62,15 @@ class ArticleEditForm(forms.ModelForm):
         if self.instance and self.instance.file:
             self.fields['file'].file_display_name = os.path.basename(self.instance.file.name)
 
+    def clean_categories(self):
+        category = self.cleaned_data.get('categories')
+        if not category:
+            raise forms.ValidationError("Sadece bir tane Kategori seçin.")
+        return category
+
 class UserArticleEditForm(forms.ModelForm):
+    categories = forms.ModelChoiceField(queryset=Category.objects.all(), empty_label="Kategori Seçiniz", required=True, error_messages={'required': "Sadece bir tane Kategori seçin."})
+
     class Meta:
         model = Article
         fields = ['title', 'description', 'file', 'keywords']
@@ -82,6 +90,12 @@ class UserArticleEditForm(forms.ModelForm):
             }),
         }
     
+    def clean_categories(self):
+        category = self.cleaned_data.get('categories')
+        if not category:
+            raise forms.ValidationError("Sadece bir tane Kategori seçin.")
+        return category
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.file:
