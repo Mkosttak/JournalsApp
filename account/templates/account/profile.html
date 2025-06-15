@@ -101,28 +101,44 @@
 
             <!-- Son Makaleler -->
             <div class="card modern-card shadow-sm slide-up mb-4">
-                <div class="card-header modern-card-header bg-primary text-white rounded-top-4">
-                    <h5 class="mb-0">Son Makalelerim</h5>
+                <div class="card-header modern-card-header bg-primary text-white rounded-top-4 py-3 px-4">
+                    <h5 class="mb-0"><i class="bi bi-journal-check me-2"></i>Son Makalelerim</h5>
                 </div>
                 <div class="card-body p-0">
+                    {% if recent_articles %}
                     <ul class="list-group list-group-flush">
-                        {% if recent_articles %}
-                            {% for article in recent_articles %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <a href="{% url 'articles:article_details' article.slug %}" class="text-decoration-none text-dark me-2">{{ article.title }}</a>
-                                    <span class="badge {% if article.isHome %}bg-success{% else %}bg-warning{% endif %} rounded-pill">
-                                        {% if article.isHome %}Ana Sayfada{% else %}İncelemede{% endif %}
-                                    </span>
-                                </li>
-                            {% endfor %}
-                        {% else %}
-                            <li class="list-group-item text-center text-muted">Henüz makale yok.</li>
-                        {% endif %}
+                        {% for article in recent_articles %}
+                        <li class="list-group-item py-3 px-4 d-flex flex-column align-items-start article-list-item-profile">
+                            <div class="d-flex justify-content-between align-items-center w-100 mb-2">
+                                <a href="{% url 'articles:article_details' article.slug %}" class="text-decoration-none text-dark fw-semibold fs-5 me-auto">{{ article.title }}</a>
+                                <span class="badge {% if article.isHome %}bg-success-subtle text-success-emphasis{% else %}bg-warning-subtle text-warning-emphasis{% endif %} rounded-pill">
+                                    {% if article.isHome %}Ana Sayfada{% else %}İncelemede{% endif %}
+                                </span>
+                            </div>
+                            {% if article.admin_note %}
+                                <small class="text-info mt-1" style="font-size: 0.75rem;">
+                                    <i class="bi bi-info-circle-fill me-1"></i> Yönetici Notu: {{ article.admin_note|truncatechars:70 }}
+                                </small>
+                            {% endif %}
+                            <small class="text-muted d-flex align-items-center mt-2">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ article.created_at|date:"d F Y" }}
+                            </small>
+                        </li>
+                        {% endfor %}
                     </ul>
+                    {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-journal-x fs-1 mb-3"></i>
+                        <p class="mb-0">Henüz makale yok.</p>
+                    </div>
+                    {% endif %}
                 </div>
                 {% if recent_articles %}
-                <div class="card-footer text-center bg-light rounded-bottom-4">
-                    <a href="{% url 'account:my_articles' %}" class="btn btn-primary btn-sm text-decoration-none">Tüm Makalelerimi Gör <i class="bi bi-arrow-right"></i></a>
+                <div class="card-footer text-center bg-light rounded-bottom-4 py-2">
+                    <a href="{% url 'account:my_articles' %}" class="btn btn-outline-primary btn-sm rounded-pill text-decoration-none px-4">
+                        Tüm Makalelerimi Gör <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
                 </div>
                 {% endif %}
             </div>
