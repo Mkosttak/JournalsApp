@@ -1,226 +1,94 @@
 {% if messages %}
-<div class="message-container">
-    {% for message in messages %}
-    {# " - " içeren mesajları atla, çünkü bunlar Contact modelinin __str__ çıktısı gibi görünüyor #}
-    {% if " - " not in message|stringformat:"s" %}
-    <div class="alert-wrapper animate__animated animate__fadeInDown">
-        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm border-0 rounded-4" role="alert">
-            <div class="d-flex align-items-center justify-content-between w-100">
-                <div class="d-flex align-items-center flex-grow-1">
-                    {% if message.tags == 'success' %}
-                    <div class="alert-icon-wrapper bg-success bg-opacity-10 rounded-circle p-2 me-3">
-                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
-                    </div>
-                    {% elif message.tags == 'error' or message.tags == 'danger' %}
-                    <div class="alert-icon-wrapper bg-danger bg-opacity-10 rounded-circle p-2 me-3">
-                        <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
-                    </div>
-                    {% elif message.tags == 'warning' %}
-                    <div class="alert-icon-wrapper bg-warning bg-opacity-10 rounded-circle p-2 me-3">
-                        <i class="bi bi-exclamation-circle-fill text-warning fs-5"></i>
-                    </div>
-                    {% elif message.tags == 'info' %}
-                    <div class="alert-icon-wrapper bg-info bg-opacity-10 rounded-circle p-2 me-3">
-                        <i class="bi bi-info-circle-fill text-info fs-5"></i>
-                    </div>
-                    {% else %}
-                    <div class="alert-icon-wrapper bg-secondary bg-opacity-10 rounded-circle p-2 me-3">
-                        <i class="bi bi-bell-fill text-secondary fs-5"></i>
-                    </div>
-                    {% endif %}
-
-                    <div class="message-content">{{ message }}</div>
-                </div>
-                <button type="button" class="btn-close ms-2 flex-shrink-0" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+<!-- TOAST MESAJ KUTULARI -->
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 1080; margin-top: 5.5rem;">
+  {% for message in messages %}
+  {% if " - " not in message|stringformat:"s" %}
+  <div class="toast shadow fade show custom-toast border-0 rounded-4 mb-3 animate__animated animate__fadeInDown"
+       role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+    <div class="d-flex align-items-center p-3">
+      {% if message.tags == 'success' %}
+        <div class="icon-wrapper bg-success bg-opacity-10 text-success me-3">
+          <i class="bi bi-check-circle-fill fs-5"></i>
         </div>
+      {% elif message.tags == 'error' or message.tags == 'danger' %}
+        <div class="icon-wrapper bg-danger bg-opacity-10 text-danger me-3">
+          <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        </div>
+      {% elif message.tags == 'warning' %}
+        <div class="icon-wrapper bg-warning bg-opacity-10 text-warning me-3">
+          <i class="bi bi-exclamation-circle-fill fs-5"></i>
+        </div>
+      {% elif message.tags == 'info' %}
+        <div class="icon-wrapper bg-info bg-opacity-10 text-info me-3">
+          <i class="bi bi-info-circle-fill fs-5"></i>
+        </div>
+      {% else %}
+        <div class="icon-wrapper bg-secondary bg-opacity-10 text-secondary me-3">
+          <i class="bi bi-bell-fill fs-5"></i>
+        </div>
+      {% endif %}
+      <div class="flex-grow-1">{{ message }}</div>
+      <button type="button" class="btn-close ms-2" data-bs-dismiss="toast" aria-label="Kapat"></button>
     </div>
-    {% endif %} {# End if " - " not in message #}
-    {% endfor %}
+  </div>
+  {% endif %}
+  {% endfor %}
 </div>
 
+<!-- TOAST CSS -->
 <style>
-.message-container {
-    position: fixed;
-    top: 4.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none;
+.toast-container {
+  pointer-events: none;
+  margin-top: 5.5rem;
 }
-
-.alert-wrapper {
-    max-width: 90%;
-    width: 420px;
-    margin-bottom: 0.75rem;
-    pointer-events: none;
+.toast {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+  opacity: 1 !important;
+  transition: opacity 0.3s ease-in-out !important;
 }
-
-.alert {
-    font-size: 0.95rem;
-    padding: 1rem 1.25rem;
-    margin-bottom: 0;
-    display: block;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
-    border-radius: 1rem !important;
-    font-weight: 500;
-    pointer-events: none;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.7) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
-    transition: all 0.3s ease;
+.toast.fade {
+  transition: opacity 0.3s ease-in-out !important;
 }
-
-.alert:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2) !important;
-    background: rgba(255, 255, 255, 0.8) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+.toast.show {
+  opacity: 1 !important;
 }
-
-.alert-icon-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    transition: all 0.3s ease;
+.custom-toast {
+  border: 1px solid rgba(200, 200, 200, 0.2);
 }
-
-.alert:hover .alert-icon-wrapper {
-    transform: scale(1.1);
+.icon-wrapper {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.btn-close {
-    position: static !important;
-    margin: 0 0 0 auto !important;
-    padding: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    pointer-events: auto;
-    opacity: 0.75;
-    transition: all 0.2s ease;
-}
-
-.btn-close:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.alert-success { 
-    background: rgba(255, 255, 255, 0.7) !important; 
-    color: #198754 !important; 
-    border: 1px solid rgba(25, 135, 84, 0.2) !important;
-}
-
-.alert-danger,
-.alert-error { 
-    background: rgba(255, 255, 255, 0.7) !important; 
-    color: #dc3545 !important; 
-    border: 1px solid rgba(220, 53, 69, 0.2) !important;
-}
-
-.alert-warning { 
-    background: rgba(255, 255, 255, 0.7) !important; 
-    color: #ffc107 !important; 
-    border: 1px solid rgba(255, 193, 7, 0.2) !important;
-}
-
-.alert-info { 
-    background: rgba(255, 255, 255, 0.7) !important; 
-    color: #0dcaf0 !important; 
-    border: 1px solid rgba(13, 202, 240, 0.2) !important;
-}
-
-.message-content { 
-    flex: 1;
-    line-height: 1.5;
-    font-size: 0.95rem;
-}
-
 @media (max-width: 576px) {
-    .message-container { 
-        top: 0.5rem; 
-    }
-    .alert-wrapper { 
-        width: 94%; 
-    }
-    .alert { 
-        font-size: 0.9rem; 
-        padding: 0.875rem 1rem; 
-    }
-    .alert-icon-wrapper {
-        width: 36px;
-        height: 36px;
-    }
-}
-
-.animate__animated { 
-    animation-duration: 0.5s; 
-    animation-fill-mode: both; 
-}
-
-@keyframes fadeInDown {
-    from { 
-        opacity: 0; 
-        transform: translate3d(0, -1rem, 0); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translate3d(0, 0, 0); 
-    }
-}
-
-.animate__fadeInDown { 
-    animation-name: fadeInDown; 
-}
-
-.alert.auto-dismiss {
-    animation: fadeInDown 0.5s, fadeOutUp 0.5s 4.5s forwards;
-}
-
-@keyframes fadeOutUp {
-    from { 
-        opacity: 1; 
-    }
-    to { 
-        opacity: 0; 
-        transform: translate3d(0, -1rem, 0); 
-    }
+  .toast-container {
+    margin-top: 4.5rem;
+  }
+  .toast {
+    width: 90vw;
+  }
 }
 </style>
 
+<!-- TOAST JS -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const alerts = document.querySelectorAll('.message-container .alert');
-    alerts.forEach(alert => {
-        alert.classList.add('auto-dismiss');
-
-        setTimeout(() => {
-            const wrapper = alert.parentNode;
-            if (wrapper) {
-                wrapper.style.height = alert.offsetHeight + 'px';
-            }
-            
-            setTimeout(() => {
-                if (wrapper) {
-                    wrapper.style.height = '0px';
-                    wrapper.style.marginBottom = '0px';
-                    wrapper.style.transition = 'all 0.5s ease-in-out';
-
-                    setTimeout(() => {
-                        if (wrapper.parentNode) {
-                            wrapper.parentNode.removeChild(wrapper);
-                        }
-                    }, 500);
-                }
-            }, 5000);
-        }, 0);
+document.addEventListener('DOMContentLoaded', function () {
+    const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    toastElList.forEach(function (toastEl) {
+        const toast = new bootstrap.Toast(toastEl, {
+            animation: true,
+            autohide: true,
+            delay: 5000
+        });
+        toast.show();
     });
 });
 </script>
